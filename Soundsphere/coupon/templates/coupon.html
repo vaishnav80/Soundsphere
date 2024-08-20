@@ -1,0 +1,77 @@
+
+{% extends 'admin_panel/base.html' %}
+
+{% block base %}
+<div class="col-xxl d-flex align-items-stretch ms-5">
+    <div class="card w-100">
+      <div class="card-body ">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="card-title fw-semibold mb-4">Coupons:</h5>
+            
+            </div>
+        <div class="table-responsive">
+          <table class="table text-nowrap mb-0 align-middle">
+            <thead class="text-dark fs-4">
+              <tr>
+                
+                <th class="border-bottom-0">
+                  <h6 class="fw-semibold mb-0">Code</h6>
+                </th>
+                
+                <th class="border-bottom-0">
+                    <h6 class="fw-semibold mb-0">description</h6>
+                </th>
+                <th class="border-bottom-0">
+                  <h6 class="fw-semibold mb-0">Offer</h6>
+                </th>
+                <th class="border-bottom-0">
+                  <h6 class="fw-semibold mb-0">Valid_from</h6>
+                </th>
+                <th class="border-bottom-0">
+                    <h6 class="fw-semibold mb-0">Valid_Upto</h6>
+                  </th>
+              </tr>
+            </thead>
+            <tbody>
+                
+                {% for i in obj %}
+                    
+                
+                    
+              <tr>
+                <td class="border-bottom-0">
+                    <h6 class="fw-semibold mb-1">{{i.code}}</h6>
+                </td>
+                <td class="border-bottom-0">
+                    <h6 class="fw-semibold mb-1">{{i.description}}</h6>
+                </td>
+                <td class="border-bottom-0">
+                    <h6 class="fw-semibold mb-1">{{i.offer}}</h6>
+                </td>
+                <td class="border-bottom-0">
+                    <h6 class="fw-semibold mb-1">{{i.valid_from}}</h6>
+                </td>
+                <td class="border-bottom-0">
+                    <h6 class="fw-semibold mb-1">{{i.valid_to}}</h6>
+                </td>
+                <td class="border-bottom-0">
+                  <h6 class="fw-semibold mb-1"><a href="{% url 'edit_coupon' i.id %}">Edit</a></h6>
+              </td>
+              <td class="border-bottom-0">
+                <a href="{% url 'delete_coupon' i.id %}">Remove</a>
+            </td>
+               
+            </tr>  
+              {% endfor %}                     
+          </tbody>
+          </table>
+          <a name="" id="" class="btn btn-primary mt-4 me-5" href="{% url 'add_coupon' %}" role="button">Add new one</a>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+{% endblock base %}

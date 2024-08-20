@@ -1,0 +1,114 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block base %}
+<div class="col-xxl d-flex align-items-stretch">
+    <div class="card w-100">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="card-title fw-semibold mb-4">Products:</h5>
+                <a name="" id="" class="btn btn-primary mt-4 me-5" href="{% url 'offer' %}" role="button">Back</a>
+            </div>
+            <div class="table-responsive">
+                {% if messages %}
+                    
+                    {% for i in messages %}
+                    <h6>{{i}}</h3>
+                    {% endfor %}
+                        
+                    
+                {% endif %}
+                <table class="table text-nowrap mb-0 align-middle">
+                    <thead class="text-dark fs-4">
+                        <tr>
+                            <th class="border-bottom-0"><h6 class="fw-semibold mb-0">Name</h6></th>
+                            <th class="border-bottom-0"><h6 class="fw-semibold mb-0">image</h6></th>
+                            <th class="border-bottom-0"><h6 class="fw-semibold mb-0">Current Price</h6></th>
+                            <th class="border-bottom-0"><h6 class="fw-semibold mb-0">Offer</h6></th>
+                            <th class="border-bottom-0"><h6 class="fw-semibold mb-0">New amount</h6></th>
+                            <th class="border-bottom-0"><h6 class="fw-semibold mb-0">Edit</h6></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in product %}
+                        <tr>
+                            <td class="border-bottom-0"><h6 class="fw-semibold mb-1">{{ i.product_id.name }}</h6></td>
+                            <td class="border-bottom-0"><img src="{{ i.product_id.image.url }}" alt="Image" class="img-thumbnail" style="max-width: 100px; max-height: 100px;"></td> 
+                            <td class="border-bottom-0 "><h6 class="fw-semibold mb-1 price" id="">{{ i.product_id.price }}</h6></td>
+                            <td class="border-bottom-0 "><h6 class="fw-semibold mb-1 offer" id="">{{ i.offer }}</h6></td>
+                            <td class="border-bottom-0"><h6 class="fw-semibold mb-1 result"><span></span></h6></td>
+                            <td class="border-bottom-0">
+                                <a name="" id="" class="btn btn-warning" href="{% url 'edit_product_offer' i.id %}" role="button">Edit</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <a name="" id="" class="btn btn-primary mt-4 me-5" href="{% url 'choose_product' %}" role="button">Add new offers</a>
+            </div>
+
+            <!-- Pagination controls -->
+            <div class="pagination-container mt-4">
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+                    {% else %}
+                    <li class="page-item disabled"><a class="page-link">&laquo; First</a></li>
+                    <li class="page-item disabled"><a class="page-link">Previous</a></li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active"><a class="page-link">{{ num }}</a></li>
+                    {% elif num > page_obj.number|add:-3 and num < page_obj.number|add:3 %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a></li>
+                    {% else %}
+                    <li class="page-item disabled"><a class="page-link">Next</a></li>
+                    <li class="page-item disabled"><a class="page-link">Last &raquo;</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Function to perform the calculation
+    function performCalculation() {
+        // Get the values from the input fields
+        var prices = document.querySelectorAll('.price');
+        var offers = document.querySelectorAll('.offer');
+        var results = document.querySelectorAll('.result span');
+        
+        // Parse the values as 
+        for (var i = 0; i < prices.length; i++) {
+            console.log(prices.length)
+            console.log(i)
+            var price = parseFloat(prices[i].textContent);
+            var offer = parseFloat(offers[i].textContent);
+            console.log(price)
+            console.log(offer)
+            // Perform the calculation
+            var discount = offer/100;
+            var obj = price*discount
+            var result = price - obj 
+            console.log(result)
+            // Update the result in the DOM
+            if (results[i]) {
+                results[i].textContent = result.toFixed(2); // Format to 2 decimal places
+            } else {
+                console.error('Result element is undefined at index:', i);
+            }
+        }
+    }
+
+    // Perform calculation when the page loads
+    window.onload = performCalculation;
+</script>
+{% endblock base %}

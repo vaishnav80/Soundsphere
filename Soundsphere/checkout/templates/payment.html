@@ -1,0 +1,32 @@
+<!-- payment.html -->
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SOUND SPHERE</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+    
+    <form id="payment-form" action="{% url 'successpage' %}">
+        <script
+            src="https://checkout.razorpay.com/v1/checkout.js"
+            data-key="{{ razorpay_key_id }}"
+            data-amount="{{ amount }}"
+            data-currency="{{ currency }}"
+            data-order_id="{{ order_id }}"
+            data-buttontext="Pay with Razorpay"
+            data-name="SOUND SPHERE"
+            data-description="Purchase"
+            data-image="{% static 'images/logos/soundsphere-removebg-preview.png' %}"
+            data-prefill.name="John Doe"
+            data-prefill.email="john.doe@example.com"
+            data-theme.color="#F37254"
+        ></script>
+        <input type="hidden" name="order_id" value="{{ order_id }}">
+    </form>
+    <div class="mt-4">
+    <a href="{% url 'checkout' %}" type="button">Back to checkout</a>
+</div>
+</body>
+</html>

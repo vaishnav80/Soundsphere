@@ -1,0 +1,16 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block base %}
+<div class="container mt-5">
+    <div class="row mb-2">
+        <div class="col">
+            <a class="btn btn-primary btn-block" href="{% url 'brand_offer' %}" role="button">Brand based offer</a>
+        </div>
+    </div>
+    <div class="row mb-2">
+        <div class="col">
+            <a class="btn btn-primary btn-block" href="{% url 'product_offer' %}" role="button">Product based offer</a>
+        </div>
+    </div>
+</div> 
+{% endblock base %}

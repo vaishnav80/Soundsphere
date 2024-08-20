@@ -1,0 +1,145 @@
+{% extends 'user_profile/base.html' %}
+
+
+{% block base %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Page</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .profile-header {
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: white;
+            padding: 20px 0;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .profile-img {
+            margin-top: -75px;
+            margin-bottom: 20px;
+        }
+        .profile-img img {
+            border: 5px solid white;
+            border-radius: 50%;
+        }
+        .profile-nav {
+            margin-bottom: 20px;
+        }
+        .profile-nav .nav-link {
+            color: #6a11cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row profile-header text-center">
+            <div class="col-md-12">
+                <h2>{{id.username}}</h2>
+                <p>{{id.email}}</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 text-center profile-img">
+                
+                {% if obj.profile_photo %}
+                <img src="{{obj.profile_photo.url}}" alt="Profile Photo" class="img-fluid rounded-circle">
+                <a href="{% url 'addphoto' %}" class="btn btn-outline-primary btn-sm mt-3">Change Photo</a>
+                {% endif %}
+        
+                <a href="{% url 'addphoto' %}" class="btn btn-outline-primary btn-sm mt-3">Add Photo</a>
+                
+            </div>
+            <div class="col-md-8">
+                <div id="errorMessages" class="error-messages bg-danger"></div>
+                <div class="card">
+                    <div class="card-header">
+                        Profile Information
+                    </div>
+                    <div class="card-body">
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="form-group" >
+                                <label for="name">First Name</label>
+                                <input type="text" class="form-control" id="name" name="name" placeholder="Enter your name" value="{{obj.first_name}}">
+                            </div>
+                            <div class="form-group">
+                                <label for="address">Last Name</label>
+                                <input type="text" class="form-control" id="lname" name="lname" placeholder="Enter your last name" value="{{obj.second_name}}">
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email address</label>
+                                <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" value="{{id.email}}" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" placeholder="Enter your phone number" value="{{obj.phone}}">
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </form>
+                    </div>
+                    
+                </div>
+            </div>
+           
+        </div>
+    </div>
+    <script>
+        document.querySelector('form').addEventListener('submit', function(event) {
+            // Prevent the form from submitting if validation fails
+            event.preventDefault();
+            const errorMessagesDiv = document.getElementById('errorMessages');
+            errorMessagesDiv.innerHTML = '';
+    
+            // Get form field values
+            const name = document.getElementById('name').value.trim();
+            const lname = document.getElementById('lname').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+    
+            const errorMessages = [];
+            // Name validation (only letters)
+            const namePattern = /^[A-Za-z]+$/;
+            if (!namePattern.test(name)) {
+                errorMessages.push('First Name must contain only letters with no spaces or numbers.');
+            }
+    
+            if (!namePattern.test(lname)) {
+                errorMessages.push('Last Name must contain only letters with no spaces or numbers.');
+            }
+    
+            // Email validation
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(email)) {
+                errorMessages.push('Please enter a valid email address.');
+                
+            }
+    
+            // Phone number validation (only digits)
+            const phonePattern = /^\d{10}$/;
+            if (!phonePattern.test(phone)) {
+                errorMessages.push('Phone Number must be exactly 10 digits.');
+            }
+
+            // Display error messages or submit the form
+            if (errorMessages.length > 0) {
+                // Display error messages
+                errorMessagesDiv.innerHTML = '<ul><li>' + errorMessages.join('</li><li>') + '</li></ul>';
+            } else {
+                // If no errors, submit the form
+                event.target.submit();
+            }
+        });
+    </script>
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+
+{% endblock base %}
+    

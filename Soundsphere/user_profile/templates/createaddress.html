@@ -1,0 +1,153 @@
+{% extends 'user_profile/base.html' %}
+
+
+{% block base %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store User Details</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        
+        {% if obj %}
+            
+        {% endif %}
+            
+        <form id="addressForm" method="post" action="{% url 'addadd' %}">
+            {% csrf_token %}
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="name">Name *</label>
+                    <input type="text" class="form-control" id="name" name="name"  value="{{obj.name}}">
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="phone_number">Phone Number *</label>
+                    <input type="text" class="form-control" id="phone_number" name="phone"  value="{{obj.phone}}">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="pincode">Pincode *</label>
+                    <input type="text" class="form-control" id="pincode" name="pincode" >
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="locality">Locality *</label>
+                    <input type="text" class="form-control" id="locality" name="locality" >
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label for="address">Address *</label>
+                    <textarea class="form-control" id="address" name="address" rows="2" ></textarea>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="city">City *</label>
+                    <input type="text" class="form-control" id="city" name="city" >
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="state">State *</label>
+                    <input type="text" class="form-control" id="state" name="state" >
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label for="landmark">Landmark (Optional)</label>
+                    <input type="text" class="form-control" id="landmark" name="landmark">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="address_type" >Address Type *</label><br>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="address_type" id="home" value="home" required>
+                    <label class="form-check-label" for="home">Home</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="address_type" id="office" value="office" required>
+                    <label class="form-check-label" for="office">Office</label>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Address</button>
+            <a href="{% url 'address' %}" class="ms-4">Cancel</a>
+        </form>
+        
+        <div id="errorMessages" style="color: red;"></div>
+        
+        <script>
+            document.getElementById('addressForm').addEventListener('submit', function(event) {
+                // Prevent form submission if there are validation errors
+                event.preventDefault();
+        
+                // Get form values and trim spaces
+                const name = document.getElementById('name').value.trim();
+                const phone = document.getElementById('phone_number').value.trim();
+                const pincode = document.getElementById('pincode').value.trim();
+                const locality = document.getElementById('locality').value.trim();
+                const address = document.getElementById('address').value.trim();
+                const city = document.getElementById('city').value.trim();
+                const state = document.getElementById('state').value.trim();
+                const landmark = document.getElementById('landmark').value.trim();
+        
+                // Validation variables
+                let isValid = true;
+                let errorMessages = [];
+        
+                // Remove leading and trailing spaces
+                document.getElementById('name').value = name;
+                document.getElementById('phone_number').value = phone;
+                document.getElementById('pincode').value = pincode;
+                document.getElementById('locality').value = locality;
+                document.getElementById('address').value = address;
+                document.getElementById('city').value = city;
+                document.getElementById('state').value = state;
+                document.getElementById('landmark').value = landmark;
+        
+                // Validate name (only characters, no numbers)
+                const namePattern = /^[A-Za-z\s]+$/;
+                if (!namePattern.test(name)) {
+                    errorMessages.push('Name must contain only letters and spaces.');
+                    isValid = false;
+                }
+        
+                // Check required fields
+                if (!name || !phone || !pincode || !locality || !address || !city || !state) {
+                    errorMessages.push('All required fields must be filled out.');
+                    isValid = false;
+                }
+        
+                // Validate phone number (example pattern: 10 digits)
+                const phonePattern = /^\d{10}$/;
+                if (!phonePattern.test(phone)) {
+                    errorMessages.push('Please enter a valid 10-digit phone number.');
+                    isValid = false;
+                }
+        
+                // Validate pincode (example pattern: 6 digits)
+                const pincodePattern = /^\d{6}$/;
+                if (!pincodePattern.test(pincode)) {
+                    errorMessages.push('Please enter a valid 6-digit pincode.');
+                    isValid = false;
+                }
+        
+                // Display error messages or submit the form
+                if (isValid) {
+                    event.target.submit(); // Submit the form
+                    document.getElementById('errorMessages').innerHTML = ''; // Clear previous errors
+                } else {
+                    document.getElementById('errorMessages').innerHTML = errorMessages.join('<br>');
+                }
+            });
+        </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+
+{% endblock base %}

@@ -1,0 +1,138 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block base %}
+<div class="container mt-5">
+    <h2 class="mb-4">Add/Edit Product</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="id_name">Name</label>
+            {{ form.name }}
+        </div>
+        <div class="form-group">
+            <label for="id_description">Description</label>
+            {{ form.description }}
+        </div>
+        <div class="form-group">
+            <label for="id_price">Price</label>
+            {{ form.price }}
+        </div>
+        <div class="form-group">
+            <label for="id_stock">Stock</label>
+            {{ form.stock }}
+        </div>
+        <div class="form-group">
+            <label for="id_color">Color</label>
+            {{ form.color }}
+        </div>
+        <div class="form-group form-check">
+            {{ form.available }}
+            <label class="form-check-label" for="id_available">Available</label>
+        </div>
+        <div class="form-group">
+            <label for="id_image">Image</label>
+            <input type="file" id="imageInput" name="image" class="form-control" accept="image/*">
+            <img id="image" src="" alt="Image" style="max-width: 100%; display: none;">
+        </div>
+        <div class="form-group">
+            <label for="id_tags">Tags</label>
+            {{ form.tags }}
+        </div>
+        <div class="form-group">
+            <label for="id_brand_id">Brand</label>
+            {{ form.brand_id }}
+        </div>
+        <div class="form-group">
+            <label for="id_type_id">Type</label>
+            {{ form.type_id }}
+        </div>
+        <div class="form-group">
+            <label for="id_connection_id">Connection Type</label>
+            {{ form.connection_id }}
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a href="{% url 'product_list' %}">
+        <button type="button" class="btn btn-warning ms-4">Back</button></a>
+    </form>
+    
+    {% if messages %}
+        
+        {% for i in messages %}
+            {{i}}
+        {% endfor %}
+            
+    {% endif %}
+        
+</div>
+
+
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+<script>
+    document.getElementById('imageInput').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                const image = document.getElementById('image');
+                image.src = event.target.result;
+                image.style.display = 'block';
+                const cropper = new Cropper(image, {
+                    aspectRatio: 1,
+                    viewMode: 1,
+                    autoCropArea: 1,
+                    ready() {
+                        console.log('Cropper is ready');
+                    }
+                });
+                
+                document.querySelector('form').addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    const canvas = cropper.getCroppedCanvas({
+                        width: 800,
+                        height: 800
+                    });
+                    canvas.toBlob(function (blob) {
+                        const formData = new FormData();
+                        formData.append('image', blob, file.name);
+                        formData.append('name', document.getElementById('id_name').value);
+                        formData.append('description', document.getElementById('id_description').value);
+                        formData.append('price', document.getElementById('id_price').value);
+                        formData.append('stock', document.getElementById('id_stock').value);
+                        formData.append('color', document.getElementById('id_color').value);
+                        formData.append('available', document.getElementById('id_available').checked);
+                        formData.append('tags', document.getElementById('id_tags').value);
+                        formData.append('brand_id', document.getElementById('id_brand_id').value);
+                        formData.append('type_id', document.getElementById('id_type_id').value);
+                        formData.append('connection_id', document.getElementById('id_connection_id').value);
+                        
+                        fetch(window.location.href, {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                            }
+                        }).then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    window.location.href = '/product/';
+                                    console.log(data.message);
+                                } else {
+                                    // Handle error (e.g., show error message)
+                                    console.error('Error:', data.message);
+                                    alert(data.message); // Display error to the user
+                                }
+                            })
+                            .catch(error => console.error('Fetch error:', error));
+                    }, file.type);
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+{% endblock base %}

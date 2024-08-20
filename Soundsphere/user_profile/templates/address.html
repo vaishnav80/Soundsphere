@@ -1,0 +1,87 @@
+{% extends 'user_profile/base.html' %}
+
+
+{% block base %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Addresses</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .address-card {
+            margin-bottom: 15px;
+        }
+        .address-card .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .address-card .address-type {
+            background-color: #e0e0e0;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .add-address-btn {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Manage Addresses</h2>
+        <div class="add-address-btn">
+            <a href="{% url 'addadd' %}" class="btn btn-primary">+ Add a New Address</a>
+        </div>
+        
+        {% for i in obj %}   
+        <div class="address-card card">
+            <div class="card-body">
+                <div class="card-header">
+                    <span class="address-type">{{i.address_type}}</span>
+                    <div >
+                        <button class="btn btn-link " type="button" >
+                            <a class="dropdown-item" href="{% url 'editaddress' 1 i.id %}">Edit</a>
+                        </button>
+                        <button class="btn btn-link " type="button" >
+                            <a class="dropdown-item" href="{% url 'deleteaddress' i.id %}" onclick="remove_address(event)">Delete</a>
+                        </button>
+                        
+                    </div>
+                </div>
+                <br>
+                <h5 class="card-title"> &nbsp;{{i.name}}&nbsp;&nbsp;&nbsp;   {{i.phone}}</h5>
+                
+                <p class="card-text">&nbsp;{{i.locality}}, {{i.Address}}, {{i.city}}, {{i.state}} -{{i.pincode}}</p>
+            </div>
+        </div>  
+        {% endfor %}
+    </div>
+    <script>
+    function remove_address(event) {
+		
+		var userResponse = confirm("Are you sure you want to delete this address");
+		if (userResponse) {
+			// User clicked "Yes" (OK)
+			alert("Address removed from the list.");
+			// Add your cancellation logic here
+		} else {
+			// User clicked "No" (Cancel)
+			alert("No changes have been made.");
+			// Refresh the page
+			event.preventDefault();
+			location.reload();
+		}
+	}
+</script>
+</script>
+   
+</body>
+</html>
+
+
+{% endblock base %}

@@ -1,0 +1,19 @@
+Metadata-Version: 2.1
+Name: mv
+Version: 0.0.4
+Summary: Parsing search terms
+Home-page: https://github.com/thorwhalen/uu/tree/master/mv
+Author: Thor Whalen
+License: apache-2.0
+Platform: any
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+
+# mv
+Parsing search terms
+
+
+To install:	```pip install mv```
+
+

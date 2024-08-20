@@ -1,0 +1,179 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block base %}
+<div class="col-xxl align-items-stretch">
+    
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Users</h5>
+                    <p class="card-text">{{user_count}}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Number of Orders</h5>
+                    <p class="card-text">{{order_count}}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Number of Products</h5>
+                    <p class="card-text">{{product_count}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<form method="get" class="mb-4">
+    <div class="row">
+        <div class="col-md-3">
+            <label for="date_range" class="form-label">Date Range</label>
+            <select id="date_range" name="date_range" class="form-select">
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
+                <option value="custom">Custom Date Range</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="start_date" class="form-label">Start Date</label>
+            <input type="date" id="start_date" name="start_date" class="form-control">
+        </div>
+        <div class="col-md-3">
+            <label for="end_date" class="form-label">End Date</label>
+            <input type="date" id="end_date" name="end_date" class="form-control">
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary">Generate Report</button>
+        </div>
+    </div>
+</form>
+
+<!-- Report Overview -->
+<div class="row mb-4">
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Total Sales</h5>
+                <p class="card-text">{{overall_sales_count}}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Total Order Amount</h5>
+                <p class="card-text">{{overall_order_amount}}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Total Discount</h5>
+                <p class="card-text">{{overall_discount}}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sales Details Table -->
+<div class="col-xxl d-flex align-items-stretch">
+    <div class="card w-100">
+      <div class="card-body p-8">
+        <h5 class="card-title fw-semibold mb-4">order history</h5>
+        <div class="table-responsive">
+          <table class="table text-nowrap mb-0 align-middle">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Amount</th>
+                                <th>Discount</th>
+                                <th>Final Amount</th>
+                                <th>payment method</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sale in page_obj %}
+                            <tr>
+                                <td>{{ sale.order_date }}</td>
+                                <td>{{ sale.id }}</td>
+                                <td>{{ sale.user_id.username }}</td>
+                                <td>{{ sale.total }}</td>
+                                <td>{{ sale.discount }}</td>
+                                <td>{{ sale.grand_total }}</td>
+                                <td>{{ sale.payment }}</td>
+                                <td>{{ sale.status }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        
+    </div>
+    <!-- <div class="pagination-container">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+            {% else %}
+            <li class="page-item disabled"><a class="page-link">&laquo; First</a></li>
+            <li class="page-item disabled"><a class="page-link">Previous</a></li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <li class="page-item active"><a class="page-link">{{ num }}</a></li>
+            {% elif num > page_obj.number|add:-3 and num < page_obj.number|add:3 %}
+            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+            {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a></li>
+            {% else %}
+            <li class="page-item disabled"><a class="page-link">Next</a></li>
+            <li class="page-item disabled"><a class="page-link">Last &raquo;</a></li>
+            {% endif %}
+        </ul>
+    </div> -->
+    <div >
+        <div class="col-md-12 text-end">
+            
+            {% if start_dates %}
+            <a href="{% url 'generate_pdf_report' date_ranges start_dates end_dates %}"  class="btn btn-danger">Download PDF</a>
+            <a href="{% url 'generate_excel_report' date_ranges start_dates end_dates %}" class="btn btn-success">Download Excel</a>
+            {% else %}
+            <a href="{% url 'generate_pdf_report' date_ranges 0 0 %}"  class="btn btn-danger">Download PDF</a>
+            <a href="{% url 'generate_excel_report' date_ranges 0 0 %}" class="btn btn-success">Download Excel</a>
+            {% endif %}
+                
+            
+        </div>
+    </div>
+    <div class="row mb-4 mt-5">
+        
+    </div>
+    
+
+<!-- Download Options -->
+
+
+</div>
+{% endblock base %}
+    

@@ -1,0 +1,141 @@
+{% extends 'user_profile/base.html' %}
+
+{% block base %}
+<div class="container mt-5">
+    <div class="mt-4">
+        <h2 class="mb-4">Add New Image</h2>
+        <form id="imageForm" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="productImage">Product Image</label>
+                <input type="file" class="form-control-file" id="productImage" name="product_image" accept="image/*" required>
+                <div class="image-container">
+                    <img id="image" src="" alt="Image" style="display: none;">
+                </div>
+                <div id="fileError" style="color: red;"></div>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+</div>
+        <script>
+            document.getElementById('imageForm').addEventListener('submit', function(event) {
+                const fileInput = document.getElementById('productImage');
+                const file = fileInput.files[0];
+                const fileError = document.getElementById('fileError');
+        
+                // Clear previous error message
+                fileError.textContent = '';
+        
+                // Check if a file is selected
+                if (!file) {
+                    fileError.textContent = 'Please select an image file.';
+                    event.preventDefault();
+                    return;
+                }
+        
+                // Validate file type
+                const validImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                if (!validImageTypes.includes(file.type)) {
+                    fileError.textContent = 'Only image files (JPG, PNG, GIF) are allowed.';
+                    event.preventDefault();
+                }
+        
+                // Optionally display the image preview
+                const imagePreview = document.getElementById('image');
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            });
+        </script>
+        
+   
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+<script>
+    let cropper;
+
+    document.getElementById('productImage').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                const image = document.getElementById('image');
+                image.src = event.target.result;
+                image.style.display = 'block';
+
+                // Destroy existing cropper instance if any
+                if (cropper) {
+                    cropper.destroy();
+                }
+
+                // Initialize new cropper instance
+                cropper = new Cropper(image, {
+                    aspectRatio: 1,
+                    viewMode: 1,
+                    autoCropArea: 1,
+                    ready() {
+                        console.log('Cropper is ready');
+                    }
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    document.getElementById('imageForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        if (cropper) {
+            const canvas = cropper.getCroppedCanvas({
+                width: 150,
+                height: 150
+            });
+
+            canvas.toBlob(function (blob) {
+                const formData = new FormData();
+                formData.append('product_image', blob, 'cropped-image.jpg');
+
+                fetch(window.location.href, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                }).then(response => {
+                    if (response.ok) {
+                        window.location.href = '/user_profile/'; // Redirect or handle success
+                    } else {
+                        console.error('Response not OK:', response);
+                    }
+                }).catch(error => console.error('Fetch error:', error));
+            }, 'image/jpeg');
+        }
+    });
+</script>
+
+<style>
+    .image-container {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        overflow: hidden;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f0f0f0; /* Optional: Background color to show in empty spaces */
+    }
+    .image-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+</style>
+{% endblock base %}

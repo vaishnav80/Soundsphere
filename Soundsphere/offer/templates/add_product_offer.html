@@ -1,0 +1,37 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block base %}
+
+<div class="container mt-5">
+    
+    <!-- Form to add a new type name and active status -->
+    <form action="" method="post" class="mb-4">
+        {% csrf_token %}
+        <div class="row">
+            
+            {% if messages %}
+                
+                {% for i in messages %}
+                    <p style="color: red;">{{i}}</p>
+                {% endfor %}
+                    
+            {% endif %}
+                
+            <div class="col-md-6 mb-3">
+                <label for="typename" class="form-label">Product Name</label>
+                <input type="text" class="form-control" id="name" name="brand" value="{{product.name}}" readonly>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="isActive" class="form-label">Offer</label>
+                <input type="number" class="form-control" id="offer" name="offer"  required>
+            </div>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <button type="submit" class="btn btn-primary">Add Offer</button>
+            <a name="" id="" class="btn btn-primary" href="{% url 'choose_product' %}" role="button">back</a>
+        </div>
+    </form>
+
+</div> 
+
+{% endblock base %}

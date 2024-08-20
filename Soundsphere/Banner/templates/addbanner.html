@@ -1,0 +1,86 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block base %}
+<div class="container mt-5">
+    <h2 class="mb-4">Add Banner</h2>
+    <form id="productForm" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="id_name">Name</label>
+            <input type="text" id="id_name" name="name" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="id_product_id">Product</label>
+            <select id="id_product_id" name="product_id" class="form-control" required>
+                {% for product in products %}
+                    <option value="{{ product.id }}">{{ product.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="id_image">Image</label>
+            <input type="file" id="imageInput" name="image" class="form-control" required>
+            <img id="image" src="" alt="Image" style="max-width: 100%; display: none;">
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+<script>
+    document.getElementById('imageInput').addEventListener('change', function (e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function (event) {
+            const image = document.getElementById('image');
+            image.src = event.target.result;
+            image.style.display = 'block';
+            const cropper = new Cropper(image, {
+                aspectRatio: 1,
+                viewMode: 1,
+                autoCropArea: 1,
+                ready() {
+                    console.log('Cropper is ready');
+                }
+            });
+
+            document.getElementById('productForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+                const canvas = cropper.getCroppedCanvas({
+                    width: 800,
+                    height: 800
+                });
+                canvas.toBlob(function (blob) {
+                    const formData = new FormData();
+                    formData.append('image', blob, file.name);
+                    formData.append('product_id', document.getElementById('id_product_id').value);
+                    formData.append('name', document.getElementById('id_name').value);
+
+                    fetch(window.location.href, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                        }
+                    }).then(response => {
+                        if (response.ok) {
+                            window.location.href = '/banner/'; // Redirect or handle success
+                        } else {
+                            console.error('Server error:', response.statusText);
+                        }
+                    }).catch(error => console.error('Fetch error:', error));
+                }, file.type);
+            });
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+</script>
+{% endblock base %}
+
+

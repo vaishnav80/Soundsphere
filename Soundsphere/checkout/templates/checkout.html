@@ -1,0 +1,820 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>SOUNDSPHERE</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+	<!--===============================================================================================-->
+	<link rel="icon" type="image/png" href="{% static 'images/icons/favicon.png' %}">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="{% static 'fonts/font-awesome-4.7.0/css/font-awesome.min.css' %}">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="{% static 'fonts/iconic/css/material-design-iconic-font.min.css' %}">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="{% static 'fonts/linearicons-v1.0.0/icon-font.min.css' %}">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="{% static 'vendor/animate/animate.css' %}">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="{% static 'vendor/css-hamburgers/hamburgers.min.css' %}">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="{% static 'vendor/animsition/css/animsition.min.css' %}">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="{% static 'vendor/select2/select2.min.css' %}">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="{% static 'vendor/daterangepicker/daterangepicker.css' %}">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="{% static 'vendor/slick/slick.css' %}">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="{% static 'vendor/MagnificPopup/magnific-popup.css' %}">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="{% static 'vendor/perfect-scrollbar/perfect-scrollbar.css' %}">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="{% static 'css/util.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}">
+	<!--===============================================================================================-->
+	<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+	<style>
+		.bordered-section {
+			border: 1px solid #dee2e6;
+			/* Bootstrap's border color */
+			padding: 20px;
+			border-radius: 5px;
+			/* Optional: Add rounded corners */
+			margin-bottom: 20px;
+			/* Optional: Add spacing between sections */
+		}
+		
+	</style>
+</head>
+
+<body class="animsition">
+
+	<!-- Header -->
+	<header>
+		<!-- Header desktop -->
+		<div class="container-menu-desktop">
+			<!-- Topbar -->
+			<div class="top-bar">
+				<div class="content-topbar flex-sb-m h-full container">
+					<div class="left-top-bar">
+						Free shipping for standard order over RS 500
+					</div>
+
+					<div class="right-top-bar flex-w h-full">
+						<a href="#" class="flex-c-m trans-04 p-lr-25">
+							Help & FAQs
+						</a>
+
+						<a href="{% url 'signin' %}" class="flex-c-m trans-04 p-lr-25">
+							My Account
+						</a>
+
+						<a href="#" class="flex-c-m trans-04 p-lr-25">
+							EN
+						</a>
+
+						<a href="#" class="flex-c-m trans-04 p-lr-25">
+							IND
+						</a>
+					</div>
+				</div>
+			</div>
+
+			<div class="wrap-menu-desktop">
+				<nav class="limiter-menu-desktop container">
+
+					<!-- Logo desktop -->
+					<a href="{% url 'home' %}" class="logo">
+						<img src="{% static 'images/soundsphere-removebg-preview.png' %}" alt="IMG-LOGO">
+					</a>
+
+					<!-- Menu desktop -->
+					<div class="menu-desktop">
+						<ul class="main-menu">
+							<li>
+								<a href="{% url 'shop' %}">Shop</a>
+							</li>
+						</ul>
+					</div>
+
+					<!-- Icon header -->
+					<div class="wrap-icon-header flex-w flex-r-m">
+
+
+						<div class="icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 js-show-cart" data-notify="2">
+							<a href="{% url 'cart' %}" style="color: black;"><i class="zmdi zmdi-shopping-cart"></i></a>
+						</div>
+
+						<a href="{% url 'wishlist' %}"
+							class="dis-block icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11" data-notify="0">
+							<i class="zmdi zmdi-favorite-outline"></i>
+						</a>
+					</div>
+				</nav>
+			</div>
+		</div>
+
+		<!-- Header Mobile -->
+		<div class="wrap-header-mobile">
+			<!-- Logo moblie -->
+			<div class="logo-mobile">
+				<a href="index.html"><img src="{% static 'images/soundsphere-removebg-preview.png' %}"
+						alt="IMG-LOGO"></a>
+			</div>
+
+			<!-- Icon header -->
+			<div class="wrap-icon-header flex-w flex-r-m m-r-15">
+				<div class="icon-header-item cl2 hov-cl1 trans-04 p-r-11 js-show-modal-search">
+					<i class="zmdi zmdi-search"></i>
+				</div>
+
+				<div class="icon-header-item cl2 hov-cl1 trans-04 p-r-11 p-l-10 icon-header-noti js-show-cart"
+					data-notify="2">
+					<i class="zmdi zmdi-shopping-cart"></i>
+				</div>
+
+				<a href="#" class="dis-block icon-header-item cl2 hov-cl1 trans-04 p-r-11 p-l-10 icon-header-noti"
+					data-notify="0">
+					<i class="zmdi zmdi-favorite-outline"></i>
+				</a>
+			</div>
+
+			<!-- Button show menu -->
+			<div class="btn-show-menu-mobile hamburger hamburger--squeeze">
+				<span class="hamburger-box">
+					<span class="hamburger-inner"></span>
+				</span>
+			</div>
+		</div>
+
+
+		<!-- Menu Mobile -->
+		<div class="menu-mobile">
+			<ul class="topbar-mobile">
+				<li>
+					<div class="left-top-bar">
+						Free shipping for standard order over RS 500
+					</div>
+				</li>
+
+				<li>
+					<div class="right-top-bar flex-w h-full">
+						<a href="#" class="flex-c-m p-lr-10 trans-04">
+							Help & FAQs
+						</a>
+
+						<a href="{% url 'signin' %}" class="flex-c-m p-lr-10 trans-04">
+							My Account
+						</a>
+
+						<a href="#" class="flex-c-m p-lr-10 trans-04">
+							EN
+						</a>
+
+						<a href="#" class="flex-c-m p-lr-10 trans-04">
+							IND
+						</a>
+					</div>
+				</li>
+			</ul>
+
+			<ul class="main-menu-m">
+
+
+				<li>
+					<a href="{% url 'shop' %}">Shop</a>
+				</li>
+
+
+
+
+			</ul>
+		</div>
+
+		<!-- Modal Search -->
+		<div class="modal-search-header flex-c-m trans-04 js-hide-modal-search">
+			<div class="container-search-header">
+				<button class="flex-c-m btn-hide-modal-search trans-04 js-hide-modal-search">
+					<img src="{% static 'images/icons/icon-close2.png' %}" alt="CLOSE">
+				</button>
+
+				<form class="wrap-search-header flex-w p-l-15">
+					<button class="flex-c-m trans-04">
+						<i class="zmdi zmdi-search"></i>
+					</button>
+					<input class="plh3" type="text" name="search" placeholder="Search...">
+				</form>
+			</div>
+		</div>
+	</header>
+
+	<div class="container my-5">
+		<div class="row">
+			<!-- Saved Addresses Section -->
+			<div class="col-md-7 mt-5">
+				<div class="bordered-section">
+					<form method="POST" action="{% url 'selectaddress' %}">
+						{% csrf_token %}
+						{% for i in address %}
+						<div class="custom-control custom-radio">
+							<input type="radio" id="{{ i.id }}" name="deliveryAddress" class="custom-control-input"
+								value="{{ i.id }}" required>
+							<label class="custom-control-label" for="{{ i.id }}">{{ i.name }}, {{ i.address}},{{i.city}},{{i.state}},{{i.pincode}}</label>
+						</div>
+						<button class="btn btn-link " type="button">
+							<a class="dropdown-item" href="{% url 'editaddress' 2 i.id %}">Edit</a>
+						</button>
+						{% endfor %}
+						<button type="submit" class="btn btn-primary mt-4">Use this Address</button>
+
+						{% if option %}
+						<p style="color: rgb(63, 8, 201);">selected address {{option.name}} &nbsp;{{option.address}}</p>
+						{% endif %}
+
+					</form>
+
+					{% if messages %}
+
+					{% for i in messages %}
+					{% if i.tags == 'error' %}
+                    <div class="alert alert-success">
+                        <p style="color: red;">{{i}}</p>
+                    </div>
+                {% endif %}
+					
+					{% endfor %}
+
+					{% endif %}
+
+				</div>
+			</div>
+			<!-- Add Address Section -->
+			<div class="col-md-7">
+				<div class="bordered-section">
+					<h4>Add Address</h4>
+					<form id="addressForm" method="post" action="{% url 'shop_address' %}">
+						{% csrf_token %}
+						<div class="form-row">
+							<div class="form-group col-md-6">
+								<label for="name">Name</label>
+								<input type="text" class="form-control" id="name" name="name" required
+									value="{{obj.name}}">
+							</div>
+							<div class="form-group col-md-6">
+								<label for="phone_number">Phone Number</label>
+								<input type="text" class="form-control" id="phone_number" name="phone" required
+									value="{{obj.phone}}">
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="form-group col-md-6">
+								<label for="pincode">Pincode</label>
+								<input type="text" class="form-control" id="pincode" name="pincode" required>
+							</div>
+							<div class="form-group col-md-6">
+								<label for="locality">Locality</label>
+								<input type="text" class="form-control" id="locality" name="locality" required>
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="form-group col-md-12">
+								<label for="address">Address</label>
+								<textarea class="form-control" id="address" name="address" rows="2" required></textarea>
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="form-group col-md-6">
+								<label for="city">City</label>
+								<input type="text" class="form-control" id="city" name="city" required>
+							</div>
+							<div class="form-group col-md-6">
+								<label for="state">State</label>
+								<input type="text" class="form-control" id="state" name="state" required>
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="form-group col-md-12">
+								<label for="landmark">Landmark (Optional)</label>
+								<input type="text" class="form-control" id="landmark" name="landmark">
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="address_type">Address Type</label><br>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="address_type" id="home" value="home"
+									required>
+								<label class="form-check-label" for="home">Home</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="address_type" id="office"
+									value="office" required>
+								<label class="form-check-label" for="office">Office</label>
+							</div>
+						</div>
+						<button type="submit" class="btn btn-primary">Save Address</button>
+					</form>
+				</div>
+				<div id="errorMessages" style="color: red;"></div>
+
+			</div>
+			<!-- Coupon Code and Order Summary Section -->
+			<div class="col-md-5">
+				<div class="bordered-section">
+					<h4>Coupon Code</h4>
+					<form method="post" action="{% url 'use_coupon' %}">
+						{% csrf_token %}
+						<a href="{% url 'user_coupon' %}">check available coupons</a>
+						<div class="input-group">
+							
+							{% if coupon %}
+							<input type="text" class="form-control"
+							placeholder="Enter your coupon code if you have one" name="coupon" value="{{coupon_code}}">
+							{% else %}
+							<input type="text" class="form-control"
+								placeholder="Enter your coupon code if you have one" name="coupon">
+							{% endif %}
+								
+							
+							<div class="input-group-append">
+								<button class="btn btn-primary" type="submit">APPLY</button>
+							</div>
+						</div>
+					</form>
+					
+					{% if messages %}
+						{% for message in messages %}
+							{% if message.tags == 'success' %}
+								<div class="alert alert-danger">
+									<p>{{ message }}</p>
+								</div>
+							{% endif %}
+						{% endfor %}
+					{% endif %}
+						
+				</div>
+				<form action="{% url 'conform' %}" method="post">
+					{% csrf_token %}
+					<div class="bordered-section">
+						<h4>Your Order</h4>
+						<ul class="list-group mb-3">
+
+							{% for i in cart %}
+							<li class="list-group-item d-flex justify-content-between lh-condensed item"
+								data-price="{{ i.rate }}" data-qty="{{ i.qty }}">
+								<h6 class="my-0">
+									{{ i.product_id.name }} * <span class="qty" style="color: blue;">{{ i.qty }}</span>
+								</h6>
+
+								<span class="total-price" id="price"></span>
+
+							</li>
+							{% endfor %}
+							<li class="list-group-item d-flex justify-content-between">
+								<span>Cart Subtotal</span>
+								<strong><span class="sub-total"></span></strong>
+							</li>
+							<li class="list-group-item d-flex justify-content-between">
+								<span>coupon offer</span> 
+								{% if coupon %}
+								<a href="{% url 'remove_coupon' %}"><span>remove coupon</span></a>
+								{% endif %}
+									
+								<strong><span name="coupon" id="coupon">{{coupon}}</span></strong>
+							</li>
+							
+							{% if coupon %}
+							<li class="list-group-item d-flex justify-content-between">
+								<span>Order Total</span>
+								<strong><span id="coupon-total"></span></strong>
+							</li>
+							{% else %}
+							<li class="list-group-item d-flex justify-content-between">
+								<span>Order Total</span>
+								<strong><span class="sub-total"></span></strong>
+							</li>
+							{% endif %}
+							
+								
+						</ul>
+					</div>
+					<div class="bordered-section">
+						<h4>Payment</h4>
+						<div class="d-block my-3">
+							<div class="custom-control custom-radio">
+								<input id="cashOnDelivery" name="paymentMethod" type="radio"
+									class="custom-control-input" value="Cash On Delivery" required>
+								<label class="custom-control-label" for="cashOnDelivery">Cash On Delivery</label>
+							</div>
+							<div class="custom-control custom-radio">
+								<input id="razorpay" name="paymentMethod" type="radio" class="custom-control-input"
+									value="Razorpay" required>
+								<label class="custom-control-label" for="razorpay">Razorpay</label>
+							</div>
+							<div class="custom-control custom-radio">
+								<input id="wallet" name="paymentMethod" type="radio"
+									class="custom-control-input" value="wallet" required>
+								<label class="custom-control-label" for="wallet">Wallet</label>
+							</div>
+						</div>
+						
+						{% if messages %}
+						{% for message in messages %}
+						{% if message.tags == 'warning' %}
+                    <div class="alert alert-success">
+                        <p style="color: red;">{{message}}</p>
+                    </div>
+                {% endif %}
+						
+					{% endfor %}
+						{% endif %}
+							
+						
+							
+
+					</div>
+
+					<button class="btn btn-primary btn-lg btn-block"  type="submit">PLACE ORDER</button>
+
+				</form>
+			</div>
+		</div>
+	</div>
+	<script>
+			let subTotal = 0;
+			document.querySelectorAll('li.item').forEach((item, index) => {
+			const qtyElement = item.querySelector('span.qty');
+			const quantity = qtyElement.textContent;
+			const lst = JSON.parse('{{ lst|escapejs }}');
+			
+			const priceElement = item.querySelector('span.total-price');
+			if (lst[index] !== undefined) {
+				const totalPrice = parseInt((lst[index] * quantity));
+				priceElement.textContent = totalPrice;
+				console.log(totalPrice);
+				
+				subTotal += parseInt(totalPrice);
+			} else {
+				priceElement.textContent = 'N/A';
+			}
+			console.log(subTotal);
+			
+
+		});
+		document.querySelectorAll('.sub-total').forEach(element => {
+				element.textContent = subTotal;
+				$.ajax({
+            type: 'POST',
+            url: '{% url "save_subtotal" %}',
+            data: {
+                'sub_total': subTotal,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+			});
+
+			
+            
+        });
+		const coupon = document.getElementById('coupon')
+		const coupon_tot = document.getElementById('coupon-total')
+		console.log(coupon.textContent)
+		let coupon_total = subTotal - coupon.textContent
+		if (coupon_total <0) {
+			coupon_total = 0 
+		}
+		coupon_tot.textContent = coupon_total
+
+	</script>
+	<!-- <script>
+		document.addEventListener('DOMContentLoaded', function () {
+			const items = document.querySelectorAll('.item');
+			let grandTotal = 0;
+			items.forEach(item => {
+				const price = parseFloat(item.getAttribute('data-price'));
+				const qty = parseInt(item.getAttribute('data-qty'), 10);
+				const totalPrice = (price * qty).toFixed(2);
+
+				const totalPriceElement = item.querySelector('.total-price');
+				totalPriceElement.textContent = totalPrice;
+
+				grandTotal += parseFloat(totalPrice);
+
+				console.log(grandTotal)
+			});
+			console.log(grandTotal)
+			document.querySelectorAll('.grand-price').forEach(element => {
+				element.textContent = grandTotal.toFixed(2);
+			});
+		});
+	</script> -->
+
+	<!-- Footer -->
+	<footer class="bg3 p-t-75 p-b-32">
+		<div class="container">
+			<div class="row">
+				<div class="col-sm-6 col-lg-3 p-b-50">
+					<h4 class="stext-301 cl0 p-b-30">
+						Pages
+					</h4>
+
+					<ul>
+						<li class="p-b-10">
+							<a href="{% url 'shop' %}" class="stext-107 cl7 hov-cl1 trans-04">
+								shop
+							</a>
+						</li>
+
+						<li class="p-b-10">
+							<a href="{% url 'cart' %}" class="stext-107 cl7 hov-cl1 trans-04">
+								cart
+							</a>
+						</li>
+
+						<li class="p-b-10">
+							<a href="'wishlist" class="stext-107 cl7 hov-cl1 trans-04">
+								wishlist
+							</a>
+						</li>
+
+						<li class="p-b-10">
+							<a href="'{% url 'home' %}" class="stext-107 cl7 hov-cl1 trans-04">
+								home
+							</a>
+						</li>
+					</ul>
+				</div>
+
+				<div class="col-sm-6 col-lg-3 p-b-50">
+					<h4 class="stext-301 cl0 p-b-30">
+						Help
+					</h4>
+
+					<ul>
+						<li class="p-b-10">
+							<a href="#" class="stext-107 cl7 hov-cl1 trans-04">
+								Track Order
+							</a>
+						</li>
+
+						<li class="p-b-10">
+							<a href="#" class="stext-107 cl7 hov-cl1 trans-04">
+								Returns
+							</a>
+						</li>
+
+						<li class="p-b-10">
+							<a href="#" class="stext-107 cl7 hov-cl1 trans-04">
+								Shipping
+							</a>
+						</li>
+
+						<li class="p-b-10">
+							<a href="#" class="stext-107 cl7 hov-cl1 trans-04">
+								FAQs
+							</a>
+						</li>
+					</ul>
+				</div>
+
+				<div class="col-sm-6 col-lg-3 p-b-50">
+					<h4 class="stext-301 cl0 p-b-30">
+						GET IN TOUCH
+					</h4>
+
+					<p class="stext-107 cl7 size-201">
+						Any questions? Let us know in store at 8th floor, 379 Hudson St, New York, NY 10018 or call us
+						on (+1) 96 716 6879
+					</p>
+
+					<div class="p-t-27">
+						<a href="#" class="fs-18 cl7 hov-cl1 trans-04 m-r-16">
+							<i class="fa fa-facebook"></i>
+						</a>
+
+						<a href="#" class="fs-18 cl7 hov-cl1 trans-04 m-r-16">
+							<i class="fa fa-instagram"></i>
+						</a>
+
+						<a href="#" class="fs-18 cl7 hov-cl1 trans-04 m-r-16">
+							<i class="fa fa-pinterest-p"></i>
+						</a>
+					</div>
+				</div>
+
+				<div class="col-sm-6 col-lg-3 p-b-50">
+					<h4 class="stext-301 cl0 p-b-30">
+						Newsletter
+					</h4>
+
+					<form>
+						<div class="wrap-input1 w-full p-b-4">
+							<input class="input1 bg-none plh1 stext-107 cl7" type="text" name="email"
+								placeholder="email@example.com">
+							<div class="focus-input1 trans-04"></div>
+						</div>
+
+						<div class="p-t-18">
+							<button class="flex-c-m stext-101 cl0 size-103 bg1 bor1 hov-btn2 p-lr-15 trans-04">
+								Subscribe
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+
+			<div class="p-t-40">
+
+				<p class="stext-107 cl6 txt-center">
+					<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+					Copyright &copy;
+					<script>document.write(new Date().getFullYear());</script> All rights reserved | Made by Vaishnav
+					<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+
+				</p>
+			</div>
+		</div>
+	</footer>
+
+	<script>
+		document.getElementById('addressForm').addEventListener('submit', function(event) {
+			// Prevent form submission if there are validation errors
+			event.preventDefault();
+	
+			// Get form values and trim spaces
+			const name = document.getElementById('name').value.trim();
+			const phone = document.getElementById('phone_number').value.trim();
+			const pincode = document.getElementById('pincode').value.trim();
+			const locality = document.getElementById('locality').value.trim();
+			const address = document.getElementById('address').value.trim();
+			const city = document.getElementById('city').value.trim();
+			const state = document.getElementById('state').value.trim();
+			const landmark = document.getElementById('landmark').value.trim();
+	
+			// Validation variables
+			let isValid = true;
+			let errorMessages = [];
+	
+			// Remove leading and trailing spaces
+			document.getElementById('name').value = name;
+			document.getElementById('phone_number').value = phone;
+			document.getElementById('pincode').value = pincode;
+			document.getElementById('locality').value = locality;
+			document.getElementById('address').value = address;
+			document.getElementById('city').value = city;
+			document.getElementById('state').value = state;
+			document.getElementById('landmark').value = landmark;
+	
+			// Validate name (only characters, no numbers)
+			const namePattern = /^[A-Za-z\s]+$/;
+			if (!namePattern.test(name)) {
+				errorMessages.push('Name must contain only letters and spaces.');
+				isValid = false;
+			}
+	
+			// Check required fields
+			if (!name || !phone || !pincode || !locality || !address || !city || !state) {
+				errorMessages.push('All required fields must be filled out.');
+				isValid = false;
+			}
+	
+			// Validate phone number (example pattern: 10 digits)
+			const phonePattern = /^\d{10}$/;
+			if (!phonePattern.test(phone)) {
+				errorMessages.push('Please enter a valid 10-digit phone number.');
+				isValid = false;
+			}
+	
+			// Validate pincode (example pattern: 6 digits)
+			const pincodePattern = /^\d{6}$/;
+			if (!pincodePattern.test(pincode)) {
+				errorMessages.push('Please enter a valid 6-digit pincode.');
+				isValid = false;
+			}
+	
+			// Display error messages or submit the form
+			if (isValid) {
+				event.target.submit(); // Submit the form
+				document.getElementById('errorMessages').innerHTML = ''; // Clear previous errors
+			} else {
+				document.getElementById('errorMessages').innerHTML = errorMessages.join('<br>');
+			}
+		});
+	</script>
+	<!-- Back to top -->
+	<div class="btn-back-to-top" id="myBtn">
+		<span class="symbol-btn-back-to-top">
+			<i class="zmdi zmdi-chevron-up"></i>
+		</span>
+	</div>
+
+
+	<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+	<!--===============================================================================================-->
+	<script src="{% static 'vendor/jquery/jquery-3.2.1.min.js' %}"></script>
+	<!--===============================================================================================-->
+	<script src="{% static 'vendor/animsition/js/animsition.min.js' %}"></script>
+	<!--===============================================================================================-->
+	<script src="{% static 'vendor/bootstrap/js/popper.js' %}"></script>
+	<script src="{% static 'vendor/bootstrap/js/bootstrap.min.js' %}"></script>
+	<!--===============================================================================================-->
+	<script src="{% static 'vendor/select2/select2.min.js' %}"></script>
+	<script>
+		$(".js-select2").each(function () {
+			$(this).select2({
+				minimumResultsForSearch: 20,
+				dropdownParent: $(this).next('.dropDownSelect2')
+			});
+		})
+	</script>
+	<!--===============================================================================================-->
+	<script src="{% static 'vendor/daterangepicker/moment.min.js' %}"></script>
+	<script src="{% static 'vendor/daterangepicker/daterangepicker.js' %}"></script>
+	<!--===============================================================================================-->
+	<script src="{% static 'vendor/slick/slick.min.js' %}"></script>
+	<script src="{% static 'js/slick-custom.js' %}"></script>
+	<!--===============================================================================================-->
+	<script src="{% static 'vendor/parallax100/parallax100.js' %}"></script>
+	<script>
+		$('.parallax100').parallax100();
+	</script>
+	<!--===============================================================================================-->
+	<script src="{% static 'vendor/MagnificPopup/jquery.magnific-popup.min.js' %}"></script>
+	<script>
+		$('.gallery-lb').each(function () { // the containers for all your galleries
+			$(this).magnificPopup({
+				delegate: 'a', // the selector for gallery item
+				type: 'image',
+				gallery: {
+					enabled: true
+				},
+				mainClass: 'mfp-fade'
+			});
+		});
+	</script>
+	<!--===============================================================================================-->
+	<script src="{% static 'vendor/isotope/isotope.pkgd.min.js' %}"></script>
+	<!--===============================================================================================-->
+	<script src="{% static 'vendor/sweetalert/sweetalert.min.js' %}"></script>
+	<script>
+		$('.js-addwish-b2').on('click', function (e) {
+			e.preventDefault();
+		});
+
+		$('.js-addwish-b2').each(function () {
+			var nameProduct = $(this).parent().parent().find('.js-name-b2').html();
+			$(this).on('click', function () {
+				swal(nameProduct, "is added to wishlist !", "success");
+
+				$(this).addClass('js-addedwish-b2');
+				$(this).off('click');
+			});
+		});
+
+		$('.js-addwish-detail').each(function () {
+			var nameProduct = $(this).parent().parent().parent().find('.js-name-detail').html();
+
+			$(this).on('click', function () {
+				swal(nameProduct, "is added to wishlist !", "success");
+
+				$(this).addClass('js-addedwish-detail');
+				$(this).off('click');
+			});
+		});
+
+		/*---------------------------------------------*/
+
+		$('.js-addcart-detail').each(function () {
+			var nameProduct = $(this).parent().parent().parent().parent().find('.js-name-detail').html();
+			$(this).on('click', function () {
+				swal(nameProduct, "is added to cart !", "success");
+			});
+		});
+
+	</script>
+	<!--===============================================================================================-->
+	<script src="{% static 'vendor/perfect-scrollbar/perfect-scrollbar.min.js' %}"></script>
+	<script>
+		$('.js-pscroll').each(function () {
+			$(this).css('position', 'relative');
+			$(this).css('overflow', 'hidden');
+			var ps = new PerfectScrollbar(this, {
+				wheelSpeed: 1,
+				scrollingThreshold: 1000,
+				wheelPropagation: false,
+			});
+
+			$(window).on('resize', function () {
+				ps.update();
+			})
+		});
+	</script>
+	<!--===============================================================================================-->
+	<script src="{% static 'js/main.js' %}"></script>
+	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+</body>
+
+</html>

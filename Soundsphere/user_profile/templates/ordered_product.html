@@ -1,0 +1,182 @@
+{% extends 'user_profile/base.html' %}
+
+
+{% block base %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Addresses</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .address-card {
+            margin-bottom: 15px;
+        }
+        .address-card .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .address-card .address-type {
+            background-color: #e0e0e0;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .add-address-btn {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Ordered Products
+        </h2>
+        
+          
+        <div class="address-card card">
+            <div class="card-body">
+                <div class="card-header">
+                    <span class="address-type">Address</span>
+                    
+                </div>
+                <br>
+                <h5 class="card-title"> &nbsp;{{address.address_id.name}}&nbsp;&nbsp;&nbsp;   {{address.address_id.phone}}</h5>
+                
+                <p class="card-text">&nbsp; {{address.address_id.address}}, {{address.address_id.city}}, {{address.address_id.state}} -{{address.address_id.pincode}}</p>
+            </div>
+        </div>  
+        <div class="col-xxl d-flex align-items-stretch">
+            <div class="card w-100">
+              <div class="card-body p-8">
+                <h5 class="card-title fw-semibold mb-4">Product</h5>
+                <div class="table-responsive">
+                  <table class="table text-nowrap mb-0 align-middle">
+                    <thead class="text-dark fs-4">
+                      <tr>
+                        <th class="border-bottom-0">
+                          <h6 class="fw-semibold mb-0">Product</h6>
+                        </th>
+                        <th class="border-bottom-0">
+                          <h6 class="fw-semibold mb-0">Rate</h6>
+                        </th>
+                        <th class="border-bottom-0">
+                          <h6 class="fw-semibold mb-0">Qty</h6>
+                        </th>
+                        <th class="border-bottom-0">
+                          {% if address.status == 'pending' %}
+                          <h6 class="fw-semibold mb-0">product return</h6>
+                          {% endif %}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        
+                        {% for i in obj %}       
+                      <tr>
+                        <td class="border-bottom-0">
+                            <h6 class="fw-semibold mb-1">{{i.product}}</h6>
+                                                      
+                        </td>
+                        <td class="border-bottom-0">
+                            <h6 class="fw-semibold mb-1">{{i.rate}}</h6>
+                        </td>
+                        <td class="border-bottom-0">
+                          <h6 class="fw-semibold mb-0 fs-4">{{i.qty}}</h6>
+                        </td>
+                       <td>{% if address.status == 'pending' and i.product_status == True and count == True %}
+                        <form action="{% url 'change_status' address.id 'canceled' i.product %}" method="post" style="display:inline;">
+                          {% csrf_token %}
+                          <button type="submit" class="btn btn-danger ms-4" onclick="showAlert(event)">cancel product</button>
+                      </form>
+                        {% elif address.status == 'success' and i.product_status == True and count == True %}
+                        <form action="{% url 'change_status' address.id 'canceled' i.product %}" method="post" style="display:inline;">
+                          {% csrf_token %}
+                          <button type="submit" class="btn btn-danger ms-4" onclick="showAlert(event)">Return product</button>
+                      </form>
+                      {% endif %}
+                      
+                          {% if i.product_status == False and count == True %}
+                          <p>product canceled</p>
+                        {% endif %}
+                        </td>
+                        <td>
+                          {% if address.status == 'success' %}
+                          <a href="{% url 'add_review' i.product %}"><button  class="btn btn-primary ms-4">Mark your Ratings</button></a>
+                          {% endif %}
+                        </td>
+                      </tr>  
+                      {% endfor %}                     
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+    <div class="container mt-5">
+      <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
+        
+        {% if address.status == 'pending' %}
+        <form action="{% url 'change_status' address.id 'canceled' 'nothing' %}" method="post" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger ms-4" onclick="showAlert2(event)">Cancel Order</button>
+      </form>
+        {% endif %}
+        
+        
+        {% if address.status == 'success' %}
+        <form action="{% url 'change_status' address.id 'canceled' 'nothing' %}" method="post" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger ms-4" onclick="showAlert2(event)">Return Order</button>
+      </form>
+      <button type="submit" class="btn btn-success ms-4">Print Invoice</button>
+      
+        {% endif %}
+          
+        <a href="{% url 'orders' %}"><button  class="btn btn-primary ms-4">Back</button></a>
+          
+      </div>
+  </div>
+ 
+
+  <script>
+      function showAlert() {
+    var userResponse = confirm("Are you sure you want to cancel this product?");
+    if (userResponse) {
+        // User clicked "Yes" (OK)
+        alert("Product cancellation confirmed.");
+        // Add your cancellation logic here
+    } else {
+        // User clicked "No" (Cancel)
+        alert("No changes have been made.");
+        // Refresh the page
+        event.preventDefault();
+        location.reload();
+    }
+}
+function showAlert2() {
+    var userResponse = confirm("Are you sure you want to cancel this Order?");
+    if (userResponse) {
+        // User clicked "Yes" (OK)
+        alert("Order cancellation confirmed.");
+        // Add your cancellation logic here
+    } else {
+        // User clicked "No" (Cancel)
+        alert("No changes have been made.");
+        // Refresh the page
+        event.preventDefault();
+        location.reload();
+    }
+}
+  </script>
+   
+</body>
+</html>
+
+
+{% endblock base %}

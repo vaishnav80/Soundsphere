@@ -1,0 +1,44 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block base %}
+
+<div class="container mt-5">
+    <h2 class="mb-4">Add Coupon</h2>
+    {% if messages %}
+        
+        {% for i in messages %}
+           <p style="color: red;"> {{i}}</p>
+        {% endfor %}
+            
+    {% endif %}
+    <form id="productForm" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="id_name">Description</label>
+            <input type="text" id="description" name="description" class="form-control" required value="{{coupon.description}}">
+        </div>
+        <div class="form-group">
+            <label for="id_product_id">Offer_Amount</label>
+            <input type="number" id="offer" name="offer" class="form-control"  value="{{coupon.offer}}">
+        </div>
+        <div class="form-group">
+            <label for="id_product_id">From(condition)</label>
+            <input type="number" id="upto" name="upto" class="form-control" required value="{{coupon.condition}}">
+        </div>
+        <div class="form-group">
+            <label for="id_product_id">Valid From</label>
+            <input type="date" id="valis_from" name="valid_from" class="form-control" required value="{{ coupon.valid_from|date:'Y-m-d' }}">
+        </div>
+        <div class="form-group">
+            <label for="id_product_id">Valid To</label>
+            <input type="date" id="expiry" name="expiry" class="form-control" required value="{{ coupon.valid_to|date:'Y-m-d' }}">
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+    
+    
+        
+</div>
+
+
+{% endblock base %}

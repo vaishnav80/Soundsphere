@@ -1,0 +1,98 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block base %}
+<div class="container mt-5">
+    <table>
+        
+        
+            
+        
+            
+        <tr>
+            <th>sub images</th>
+        </tr>
+        {% for i in obj2 %}
+        <td>
+            <td class="border-bottom-0"><img src="{{ i.image.url }}" alt="Image" class="img-thumbnail" style="max-width: 100px; max-height: 100px;"></td>
+        </td>
+        
+        {% endfor %}
+    </table>
+    <div class="mt-4">
+    <h2 class="mb-4">Add New Image</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="productName">Product Name</label>
+            <input type="text" class="form-control" id="productName" placeholder="Enter product name" value="{{obj.name}}">
+        </div>
+        <div class="form-group">
+            <label for="productImage">Product Image</label>
+            <input type="file" class="form-control-file" id="productImage" name="product_image">
+            <img id="image" src="" alt="Image" style="max-width: 100%; display: none;">
+        </div>
+       
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <a href="{% url 'product_list' %}">
+            <button type="button" class="btn btn-warning ms-4">Back</button></a>
+    </form>
+    </div>
+
+</div>
+
+
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+<script>
+    document.getElementById('imageInput').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                const image = document.getElementById('image');
+                image.src = event.target.result;
+                image.style.display = 'block';
+                const cropper = new Cropper(image, {
+                    aspectRatio: 1,
+                    viewMode: 1,
+                    autoCropArea: 1,
+                    ready() {
+                        console.log('Cropper is ready');
+                    }
+                });
+                
+                document.querySelector('form').addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    const canvas = cropper.getCroppedCanvas({
+                        width: 800,
+                        height: 800
+                    });
+                    canvas.toBlob(function (blob) {
+                        const formData = new FormData();
+                        formData.append('image', blob, file.name);
+                        formData.append('name', document.getElementById('id_p_id').value);
+                        
+                        
+                        fetch(window.location.href, {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                            }
+                        }).then(response => {
+                            if (response.ok) {
+                                window.location.href = '/product/'; // Redirect or handle success
+                            }
+                        }).catch(error => console.error('Error:', error));
+                    }, file.type);
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+{% endblock base %}

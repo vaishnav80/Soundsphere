@@ -1,0 +1,25 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block base %}
+
+<h4>Categories:</h4>
+<div class="container mt-5">
+    <div class="row mb-2">
+        <div class="col">
+            <a class="btn btn-primary btn-block" href="{% url 'brand' %}" role="button">Brand</a>
+        </div>
+    </div>
+    <div class="row mb-2">
+        <div class="col">
+            <a class="btn btn-primary btn-block" href="{% url 'connection' %}" role="button">Connection Type</a>
+        </div>
+    </div>
+    
+    <div class="row mb-2">
+        <div class="col">
+            <a class="btn btn-primary btn-block" href="{% url 'types' %}" role="button">Types</a>
+        </div>
+    </div>
+</div>
+
+{% endblock base %}

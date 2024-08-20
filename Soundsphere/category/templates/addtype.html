@@ -1,0 +1,82 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block base %}
+
+<div class="container mt-5">
+    
+
+    <!-- Form to add a new type name and active status -->
+     
+     {% if messages %}
+        
+        {% for i in messages %}
+            message
+        {% endfor %}
+            
+     {% endif %}
+        
+    <form id="typeForm" method="post" class="mb-4">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="typename" class="form-label">Type Name</label>
+                <input type="text" class="form-control" id="typename" name="typename" required>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="isActive" class="form-label">Active Status</label>
+                <select class="form-control" id="isActive" name="isActive" required>
+                    <option value="true">Active</option>
+                    <option value="false">Inactive</option>
+                </select>
+            </div>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+        <button type="submit" class="btn btn-primary">Add Type</button>
+        <a name="" id="" class="btn btn-primary" href="{% url 'types' %}" role="button">back</a>
+    </div>
+    <div id="errorMessages" style="color: red;"></div>
+    </form>
+
+
+</div> 
+<script>
+    document.getElementById('typeForm').addEventListener('submit', function(event) {
+        // Prevent form submission if there are validation errors
+        event.preventDefault();
+
+        // Get form values and trim spaces
+        const name = document.getElementById('typename').value.trim();
+        
+        // Validation variables
+        let isValid = true;
+        let errorMessages = [];
+
+        // Remove leading and trailing spaces
+        document.getElementById('typename').value = name;
+       
+
+        // Validate name (only characters, no numbers)
+        const namePattern = /^[A-Za-z\s]+$/;
+        if (!namePattern.test(name)) {
+            errorMessages.push('type name must contain only letters and spaces.');
+            isValid = false;
+        }
+
+        // Check required fields
+        if (!name) {
+            errorMessages.push('type must be filled out.');
+            isValid = false;
+        }
+
+
+        // Display error messages or submit the form
+        if (isValid) {
+            event.target.submit(); // Submit the form
+            document.getElementById('errorMessages').innerHTML = ''; // Clear previous errors
+        } else {
+            document.getElementById('errorMessages').innerHTML = errorMessages.join('<br>');
+        }
+    });
+</script>
+
+{% endblock base %}
