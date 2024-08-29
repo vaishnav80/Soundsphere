@@ -7,7 +7,7 @@ from django.contrib.auth import authenticate,login,logout
 from user.views import Home
 from django.contrib.auth.models import User
 from django.utils.dateparse import parse_date
-from django.db.models import Sum
+from django.db.models import Sum,Count
 from datetime import date, timedelta
 from django.http import HttpResponse
 from django.core.paginator import Paginator
@@ -25,8 +25,10 @@ from openpyxl import Workbook # type: ignore
 from openpyxl.styles import Font, Alignment # type: ignore
 from django.utils.dateparse import parse_date
 from functools import wraps
-
-
+import json
+from django.db.models.functions import TruncYear,TruncMonth,TruncDay
+from datetime import datetime
+from collections import Counter
 
 def active_admin(func):
     @wraps(func)
@@ -35,7 +37,6 @@ def active_admin(func):
             
             return func(req, *args, **kwargs)
         else:
-            print('fbvdj')
             return redirect(admin_login)
     return _wrapped_view
 
@@ -53,7 +54,25 @@ def admin_login(req):
 
 @active_admin
 def admin_dashboard(req):
-    
+            
+            current_date = datetime.now()
+            
+            orders_this_month = Orders.objects.filter(order_date__year=current_date.year, order_date__month=current_date.month)
+            orders_by_day = orders_this_month.annotate(day=TruncDay('order_date')).values('day').annotate(order_count=Count('id')).order_by('day')
+            labels = [entry['day'].strftime('%Y-%m-%d') for entry in orders_by_day]  # 'YYYY-MM-DD'
+            data = [entry['order_count'] for entry in orders_by_day]
+            choice = req.GET.get('chart')
+            if choice == 'year':
+                orders_by_year = Orders.objects.annotate(year=TruncYear('order_date')).values('year').annotate(order_count=Count('id')).order_by('year')
+                labels = [entry['year'].strftime('%Y') for entry in orders_by_year]  # Convert to string year
+                data = [entry['order_count'] for entry in orders_by_year]
+            elif choice == 'month':
+                orders_by_month = Orders.objects.annotate(month=TruncMonth('order_date')).values('month').annotate(order_count=Count('id')).order_by('month')
+                labels = [entry['month'].strftime('%Y-%m') for entry in orders_by_month]  # Convert to 'YYYY-MM'
+                data = [entry['order_count'] for entry in orders_by_month]
+            
+                
+
             sales = Orders.objects.all().exclude(Q(confirm = False) | Q(status = 'canceled')).order_by('-id')
             user_count = User.objects.all().count()
             order_count = Orders.objects.all().count()
@@ -80,9 +99,19 @@ def admin_dashboard(req):
             overall_order_amount = sales.aggregate(Sum('grand_total'))['grand_total__sum'] or 0
             overall_discount = sales.aggregate(Sum('discount'))['discount__sum'] or 0
             overall_total = sales.aggregate(Sum('total'))['total__sum'] or 0
-            
-             
-
+            best_selling_product = items.objects.values('product').annotate(count=Count('product')).order_by('-count')
+            brandss = items.objects.all()
+            br = []
+            con = []
+            for i in brandss:
+                obj = Product.objects.filter(name = i.product)
+                for j in obj:
+                    br.append(j.brand_id.name)
+                    con.append(j.connection_id.name)
+            brand = Counter(br)
+            brand = sorted(brand.items(), key=lambda x: x[1], reverse=True)
+            connection = Counter(con)
+            connection = sorted(connection.items(), key=lambda x: x[1], reverse=True)
             context = {
                 'user_count' : user_count,
                 'order_count' : order_count,
@@ -94,7 +123,13 @@ def admin_dashboard(req):
                 'overall_discount': overall_discount,
                 'date_ranges' : date_range,
                 'start_dates' : start_date,
-                'end_dates' : end_date
+                'end_dates' : end_date,
+                'labels': json.dumps(labels),
+                'data': json.dumps(data),
+                'best_selling_product' : best_selling_product,
+                'brand' : brand,
+                'connection' : connection
+
 
             }
             return render(req,'admin_dashboard.html',context)
@@ -194,7 +229,7 @@ def generate_pdf_report(request, date_range, start_date, end_date):
     data = [
         ['Date', 'Order_id', 'Customer', 'Amount', 'Discount', 'Final Amount', 'Payment Method', 'Status'],
     ]
-    for sale in sales:
+    for sale in sales:  
         data.append([
             sale.order_date,
             sale.id,

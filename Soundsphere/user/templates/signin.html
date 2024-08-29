@@ -8,138 +8,173 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <style>
-    body {
-      background: url('https://source.unsplash.com/random/1920x1080') no-repeat center center fixed;
-      background-size: cover;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin: 0;
-    }
-    .login-container {
-      background: rgba(255, 255, 255, 0.9);
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 400px;
-    }
-    .login-header {
-      text-align: center;
-      margin-bottom: 1.5rem;
-    }
-    .login-header h1 {
-      font-size: 2rem;
-      font-weight: bold;
-      color: #333;
-    }
-    .form-label {
-      font-weight: bold;
-      color: #333;
-    }
-    .form-control {
-      background: rgba(255, 255, 255, 0.7);
-      border: 1px solid #ddd;
-      padding: 0.75rem;
-      border-radius: 5px;
-    }
-    .btn-custom {
-      background: #007bff;
-      border: none;
-      padding: 0.75rem;
-      border-radius: 5px;
-      font-weight: bold;
-      color: #fff;
-      transition: background 0.3s ease;
-    }
-    .btn-custom:hover {
-      background: #0056b3;
-    }
-    .extra-links {
-      text-align: center;
-      margin-top: 1rem;
-    }
-    .extra-links a {
-      color: #007bff;
-      text-decoration: none;
-      margin: 0 0.5rem;
-    }
-    .extra-links a:hover {
-      text-decoration: underline;
-    }
-    .btn-google {
-      background: #db4437;
-      color: #fff;
-      border: none;
-      padding: 0.75rem;
-      border-radius: 5px;
-      font-weight: bold;
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .btn-google:hover {
-      background: #c1351d;
-    }
-    .btn-google img {
-      width: 20px;
-      height: 20px;
-      margin-right: 0.5rem;
-    }
-    @media (max-width: 576px) {
+    <style>
+      body {
+        background: url('https://source.unsplash.com/random/1920x1080') no-repeat center center fixed;
+        background-size: cover;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0;
+        background-image: url('../../media/product_images/headphone-earphone-headset-for-music-line-pop-art-potrait-logo-colorful-design-with-dark-background-abstract-illustration-vector.jpg');
+      }
+      body::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: inherit;
+        background-size: inherit;
+        background-attachment: fixed;
+        filter: blur(10px);
+        z-index: -1;
+      }
+      .logo {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 150px;
+  height: auto;
+  background-image: url('../../static/images/soundsphere-removebg-preview.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  filter: brightness(0) invert(1); /* This makes the logo white */
+}
+      .logo a {
+        display: block;
+        width: 100%;
+        height: 100%;
+        text-decoration: none;
+        color: white;
+        font-weight: bold;
+        text-align: center;
+        line-height: 150px; /* Adjust this based on the height of the logo */
+        font-size: 20px;
+      }
       .login-container {
-        padding: 1.5rem;
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 400px;
+      }
+      .login-header {
+        text-align: center;
+        margin-bottom: 1.5rem;
       }
       .login-header h1 {
-        font-size: 1.5rem;
+        font-size: 2rem;
+        font-weight: bold;
+        color: #333;
       }
-    }
-  </style>
-</head>
-<body>
-  <div class="login-container">
-    <div class="login-header">
-      <h1>Sign In</h1>
+      .form-label {
+        font-weight: bold;
+        color: #333;
+      }
+      .form-control {
+        background: rgba(255, 255, 255, 0.7);
+        border: 1px solid #ddd;
+        padding: 0.75rem;
+        border-radius: 5px;
+      }
+      .btn-custom {
+        background: #031930;
+        border: none;
+        padding: 0.75rem;
+        border-radius: 5px;
+        font-weight: bold;
+        color: #fff;
+        transition: background 0.3s ease;
+      }
+      .btn-custom:hover {
+        background: #0056b3;
+      }
+      .extra-links {
+        text-align: center;
+        margin-top: 1rem;
+      }
+      .extra-links a {
+        color: #007bff;
+        text-decoration: none;
+        margin: 0 0.5rem;
+      }
+      .extra-links a:hover {
+        text-decoration: underline;
+      }
+      .btn-google {
+        background: #000233;
+        color: #fff;
+        border: none;
+        padding: 0.75rem;
+        border-radius: 5px;
+        font-weight: bold;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .btn-google:hover {
+        background: #0e0661;
+      }
+      .btn-google img {
+        width: 20px;
+        height: 20px;
+        margin-right: 0.5rem;
+      }
+      @media (max-width: 576px) {
+        .login-container {
+          padding: 1.5rem;
+        }
+        .login-header h1 {
+          font-size: 1.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="logo">
+      <a href="/">.</a>
     </div>
-    
-    {% if messages %}
-      
-      {% for i in messages %}
-        <h6 style="color: red;">{{i}}</h3>
-      {% endfor %}
-        
-    {% endif %}
-      
-    <form method="post" action="{% url 'signin' %}">
-      {% csrf_token %}
-      <div class="mb-3">
-        <label for="username" class="form-label">Username</label>
-        <input type="text" class="form-control" id="username" name="username" required>
+    <div class="login-container">
+      <div class="login-header">
+        <h1>Sign In</h1>
       </div>
-      <div class="mb-3">
-        <label for="password" class="form-label">Password</label>
-        <input type="password" class="form-control" id="password" name="password" required>
-      </div>
-      <div class="d-grid">
-        <button type="submit" class="btn btn-custom">Login</button>
-      </div>
-    </form>
-    <hr>
-    {% load socialaccount %}
-        <a href="{% provider_login_url 'google' %}" class="btn btn-danger btn-block">
-            Login with Google
-        </a>
-    <div class="extra-links">
-      <a href="{% url 'signup' %}">Sign Up</a> | 
-      <a href="{% url 'forgotpassword' %}">Forgot Password?</a>
-    </div>
-    
 
-  
-  
+      {% if messages %}
+        {% for i in messages %}
+          <h6 style="color: red;">{{i}}</h6>
+        {% endfor %}
+      {% endif %}
+
+      <form method="post" action="">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="username" class="form-label">Username</label>
+          <input type="text" class="form-control" id="username" name="username" required>
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+        <div class="d-grid">
+          <button type="submit" class="btn btn-custom">Login</button>
+        </div>
+      </form>
+      <hr>
+      {% load socialaccount %}
+        <a href="{% provider_login_url 'google' %}" class="btn btn-google btn-block">
+          Login with Google
+        </a>
+      <div class="extra-links">
+        <a href="{% url 'signup' %}">Sign Up</a> |
+        <a href="{% url 'forgotpassword' %}">Forgot Password?</a>
+      </div>
+    </div>
+
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

@@ -1,6 +1,46 @@
 {% extends 'user_profile/base.html' %}
 
+<style>
+  /* Default styles already handled by Bootstrap */
 
+@media (max-width: 768px) {
+    /* Reduce the font size for small screens */
+    .table thead th h6,
+    .table tbody td h6 {
+        font-size: 14px;
+    }
+
+    /* Make table rows stack */
+    .table tbody tr {
+        display: block;
+        margin-bottom: 15px;
+    }
+
+    .table tbody td {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px;
+        border: 1px solid #dee2e6;
+        border-bottom: none;
+    }
+
+    .table tbody td:last-child {
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    /* Label the cells */
+    .table tbody td:before {
+        content: attr(data-label);
+        font-weight: bold;
+        width: 50%;
+    }
+
+    .table thead {
+        display: none; /* Hide the table header on small screens */
+    }
+}
+
+</style>
 {% block base %}
     
     <br>
@@ -59,24 +99,25 @@
                     <td>
                       
   
-                      {% if i.status == 'success' and i.confirm %}
+                      {% if i.status == 'success'  %}
                       <h6 class="fw-semibold mb-1" style="color: green;">Delivered</h6> 
-                      {% elif i.status == 'pending' and i.confirm  %}
+                      {% elif i.status == 'pending' and i.confirm %}
                       <h6 class="fw-semibold mb-1" style="color: rgb(35, 138, 222);">{{i.status}}</h6> 
                       {% elif i.status == 'canceled' and i.confirm  %}
-                      <h6 class="fw-semibold mb-1" style="color: red;">{{i.status}}</h6> 
+                      <h6 class="fw-semibold mb-1" style="color: red;">{{i.status}}</h6>  
                       {% else %}
-                      none
-                      {% endif %} 
-
+                      <h6 class="fw-semibold mb-1" style="color: red;">Payment Failed</h6> 
+                      {% endif %}
                     </td>
                     <td>
-                      {% if i.confirm %}
+                        {% if i.confirm or i.status == 'canceled'%}
                         <a href="{% url 'ordered_product' i.id %}">
-                        <h6 class="fw-semibold mb-1">details</h6> </a>
-                        {% else %}
-                        order is not completed
-                      {% endif %}
+                          <h6 class="fw-semibold mb-1">details</h6> </a>
+                        {% elif not i.confirm and i.status == 'pending'%}
+                        
+                        <a href="{% url 'ordered_product' i.id %}">
+                          <h6 class="fw-semibold mb-1">Retry Payment</h6> </a>
+                          {% endif %}
                     </td>
                   </tr>  
                   {% endfor %}                     

@@ -1,32 +1,56 @@
-<!-- payment.html -->
-{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>SOUND SPHERE</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment</title>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 <body>
-    
-    <form id="payment-form" action="{% url 'successpage' %}">
-        <script
-            src="https://checkout.razorpay.com/v1/checkout.js"
-            data-key="{{ razorpay_key_id }}"
-            data-amount="{{ amount }}"
-            data-currency="{{ currency }}"
-            data-order_id="{{ order_id }}"
-            data-buttontext="Pay with Razorpay"
-            data-name="SOUND SPHERE"
-            data-description="Purchase"
-            data-image="{% static 'images/logos/soundsphere-removebg-preview.png' %}"
-            data-prefill.name="John Doe"
-            data-prefill.email="john.doe@example.com"
-            data-theme.color="#F37254"
-        ></script>
-        <input type="hidden" name="order_id" value="{{ order_id }}">
+    <h1>Proceed to Payment</h1>
+
+    <form id="paymentForm">
+        <button id="rzp-button1">Pay Now</button>
     </form>
-    <div class="mt-4">
-    <a href="{% url 'checkout' %}" type="button">Back to checkout</a>
-</div>
+
+    <script>
+        var options = {
+    "key": "{{ razorpay_key_id }}", 
+    "amount": "{{ amount }}", 
+    "currency": "{{ currency }}", 
+    "name": "Your Company Name",
+    "description": "Purchase Description",
+    "order_id": "{{ order_id }}", 
+    "handler": function (response){
+        window.location.href = "{{ callback_url }}";  // Redirect to success page
+    },
+    "prefill": {
+        "name": "Customer Name",
+        "email": "customer@example.com",
+        "contact": "9999999999"
+    },
+    "theme": {
+        "color": "#F37254"
+    },
+    "modal": {
+        "ondismiss": function(){
+            window.location.href = "{{ redirect_url }}";  // Redirect to failure page
+        }
+    },
+    "method": {
+        "netbanking": true,
+        "card": true,
+        "wallet": true,
+        "upi": true,
+        "emi": true,
+        "paylater": true,  
+    }
+};
+var rzp1 = new Razorpay(options);
+document.getElementById('rzp-button1').onclick = function(e){
+    rzp1.open();
+    e.preventDefault();
+}
+    </script>
 </body>
 </html>

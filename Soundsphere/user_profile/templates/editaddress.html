@@ -34,7 +34,15 @@
                 <div class="form-group col-md-6">
                     <label for="pincode">Pincode</label>
                     <input type="text" class="form-control" id="pincode" name="pincode" required value="{{obj.pincode}}">
+                    {% if messages %}
+                    
+                    {% for i in messages %}
+                        <span style="color: red;">{{i}}</span>
+                    {% endfor %}
+                        
+                {% endif %}
                 </div>
+                    
                 <div class="form-group col-md-6">
                     <label for="locality">Locality</label>
                     <input type="text" class="form-control" id="locality" name="locality" required value="{{obj.locality}}">

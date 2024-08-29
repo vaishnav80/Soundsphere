@@ -38,6 +38,9 @@
 	<link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}">
 	<!--===============================================================================================-->
 	<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include Razorpay Checkout script -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 	<style>
 		.bordered-section {
 			border: 1px solid #dee2e6;
@@ -70,7 +73,7 @@
 							Help & FAQs
 						</a>
 
-						<a href="{% url 'signin' %}" class="flex-c-m trans-04 p-lr-25">
+						<a href="{% url 'signin' 1 %}" class="flex-c-m trans-04 p-lr-25">
 							My Account
 						</a>
 
@@ -168,7 +171,7 @@
 							Help & FAQs
 						</a>
 
-						<a href="{% url 'signin' %}" class="flex-c-m p-lr-10 trans-04">
+						<a href="{% url 'signin' 1 %}" class="flex-c-m p-lr-10 trans-04">
 							My Account
 						</a>
 
@@ -217,11 +220,11 @@
 		<div class="row">
 			<!-- Saved Addresses Section -->
 			<div class="col-md-7 mt-5">
-				<div class="bordered-section">
+				<div class="bordered-section" >
 					<form method="POST" action="{% url 'selectaddress' %}">
 						{% csrf_token %}
 						{% for i in address %}
-						<div class="custom-control custom-radio">
+						<div class="custom-control custom-radio" id="1">
 							<input type="radio" id="{{ i.id }}" name="deliveryAddress" class="custom-control-input"
 								value="{{ i.id }}" required>
 							<label class="custom-control-label" for="{{ i.id }}">{{ i.name }}, {{ i.address}},{{i.city}},{{i.state}},{{i.pincode}}</label>
@@ -230,12 +233,23 @@
 							<a class="dropdown-item" href="{% url 'editaddress' 2 i.id %}">Edit</a>
 						</button>
 						{% endfor %}
+						
+						{% if address %}
 						<button type="submit" class="btn btn-primary mt-4">Use this Address</button>
+						{% endif %}
+							
+						
 
 						{% if option %}
-						<p style="color: rgb(63, 8, 201);">selected address {{option.name}} &nbsp;{{option.address}}</p>
+						<p style="color: rgb(63, 8, 201);" id="addr">selected address {{option.name}} &nbsp;{{option.address}}</p>
 						{% endif %}
+						
+						
+						<div id="error-message" style="color: red; display: none;">choose an address first</div>
 
+					
+							
+						
 					</form>
 
 					{% if messages %}
@@ -374,7 +388,8 @@
 
 							</li>
 							{% endfor %}
-							<li class="list-group-item d-flex justify-content-between">
+							<hr  style="display: none;">
+							<li class="list-group-item d-flex justify-content-between mt-4">
 								<span>Cart Subtotal</span>
 								<strong><span class="sub-total"></span></strong>
 							</li>
@@ -386,21 +401,21 @@
 									
 								<strong><span name="coupon" id="coupon">{{coupon}}</span></strong>
 							</li>
+							<hr  style="display: none;">
 							
-							{% if coupon %}
-							<li class="list-group-item d-flex justify-content-between">
+							<li class="list-group-item d-flex justify-content-between mt-4">
 								<span>Order Total</span>
-								<strong><span id="coupon-total"></span></strong>
+								<strong><span id="order-total"></span></strong>
 							</li>
-							{% else %}
-							<li class="list-group-item d-flex justify-content-between">
-								<span>Order Total</span>
-								<strong><span class="sub-total"></span></strong>
-							</li>
-							{% endif %}
 							
+							<li class="list-group-item d-flex justify-content-between">
+								<span>Delivery charge</span>
+								<strong><span id="charge">{{delivery}}</span></strong>
+							</li>
 								
 						</ul>
+						<span class="ms-3" style="padding-left: 280px;font-size: 20px;">Total</span>
+						<strong><span class="charge" style="margin-left: 10px; font-size: 20px;" id="total">0</span></strong>
 					</div>
 					<div class="bordered-section">
 						<h4>Payment</h4>
@@ -437,13 +452,96 @@
 							
 
 					</div>
+					
+						
+		
+				
+					<button class="btn btn-primary btn-lg btn-block" id="rzp-button1" style="display: none;"  type="submit">PLACE ORDER</button>
 
-					<button class="btn btn-primary btn-lg btn-block"  type="submit">PLACE ORDER</button>
-
+					<button class="btn btn-primary btn-lg btn-block" id="normal"  type="submit">PLACE ORDER</button>
+					
 				</form>
 			</div>
 		</div>
 	</div>
+	<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+	<script>
+	
+let addr = 'c'
+document.getElementById('razorpay').onclick= function(){
+	 let count =1
+	if(count==1){
+		
+		let a = document.getElementById('rzp-button1')
+		console.log(a);
+		let b = document.getElementById('normal')
+		a.style.display = "block"
+		b.style.display = "none"
+		addr = document.getElementById('addr')
+		
+		
+	}
+	
+	 
+}
+document.getElementById('rzp-button1').onclick = function(e) {
+    e.preventDefault();
+    if (addr==null){
+			var errorDiv = document.getElementById("error-message");
+			var one = document.getElementById("1");
+			errorDiv.style.display = "block";
+			one.scrollIntoView({behavior:"smooth"})
+		}
+	else{
+    fetch('{% url "create_order" %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+    })
+    .then(response => response.json())
+    .then(data => {
+        openRazorpayModal(data);
+    })
+    .catch(error => console.error('Error:', error));
+};
+}
+function openRazorpayModal(data) {
+    console.log('Opening Razorpay Modal with data:', data);  // Debugging line
+    var options = {
+        "key": data.razorpay_key_id,
+        "amount": data.amount,
+        "currency": data.currency,
+        "name": "SounSphere",
+        "description": "Purchase Description",
+        "order_id": data.order_id,
+        "handler": function (response) {
+            console.log('Payment Success:', response);  // Debugging line
+            window.location.href = data.callback_url;
+        },
+        "prefill": {
+            "name": "Customer Name",
+            "email": "customer@example.com",
+            "contact": "9999999999"
+        },
+        "theme": {
+            "color": "#F37254"
+        },
+        "modal": {
+            "ondismiss": function() {
+                console.log('Payment Modal Closed. Redirecting to failure URL');  // Debugging line
+                window.location.href = data.redirect_url;
+            }
+        }
+    };
+    var rzp1 = new Razorpay(options);
+    rzp1.open();
+}
+
+
+    </script>
 	<script>
 			let subTotal = 0;
 			document.querySelectorAll('li.item').forEach((item, index) => {
@@ -461,33 +559,55 @@
 			} else {
 				priceElement.textContent = 'N/A';
 			}
-			console.log(subTotal);
+			console.log(subTotal,'dfds');
 			
 
 		});
 		document.querySelectorAll('.sub-total').forEach(element => {
 				element.textContent = subTotal;
-				$.ajax({
-            type: 'POST',
-            url: '{% url "save_subtotal" %}',
-            data: {
-                'sub_total': subTotal,
-                'csrfmiddlewaretoken': '{{ csrf_token }}'
-            },
-			});
+				
 
 			
             
         });
 		const coupon = document.getElementById('coupon')
-		const coupon_tot = document.getElementById('coupon-total')
-		console.log(coupon.textContent)
+		const order_tot = document.getElementById('order-total')
+		const charge = document.getElementById('charge')
+		const total = document.getElementById('total')
+		if (subTotal>10000) {
+			charge.textContent = 0
+		}
 		let coupon_total = subTotal - coupon.textContent
+		
 		if (coupon_total <0) {
 			coupon_total = 0 
-		}
-		coupon_tot.textContent = coupon_total
 
+		}
+		if (isNaN(coupon_total)){
+			console.log('done');
+			
+			coupon_total = subTotal
+		}
+		
+		console.log(coupon_total,'v');
+		order_tot.textContent = coupon_total
+
+	
+		console.log(subTotal,'dsfddsfdsg')
+		
+
+			let total1 = coupon_total + Number(charge.textContent)
+			console.log(total1)
+		
+		total.textContent = total1
+		$.ajax({
+            type: 'POST',
+            url: '{% url "save_subtotal" %}',
+            data: {
+                'sub_total': total1,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+			});
 	</script>
 	<!-- <script>
 		document.addEventListener('DOMContentLoaded', function () {

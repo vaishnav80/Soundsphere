@@ -47,7 +47,7 @@ def cart(req):
         return render(req,'cart.html',context)
     else:
         messages.warning(req,'please login first')
-        return redirect(signin)
+        return redirect(signin,2)
 
 def remove(req,id):
     obj = Cart.objects.get(pk = id)

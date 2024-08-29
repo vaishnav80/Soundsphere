@@ -3,14 +3,19 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from .models import *
 from checkout.models import Orders,items,shiped_address
-from checkout.views import checkout
+from checkout.views import checkout,get_coordinates,calculate_distance
 from admin_panel.models import Product
 from django.db.models import *
 from wallet.models import Wallet,Wallet_transaction
 from django.db.models import Count
 from wallet.views import active_user
-
-
+import razorpay # type: ignore
+from django.conf import settings
+from datetime import date
+from django.http import JsonResponse
+from django.urls import reverse
+import json
+from offer.models import Product_offer,Brand_offer
 
 @active_user
 def profile(req):
@@ -107,20 +112,45 @@ def editaddress(req,num,id):
         obj.state = state
         obj.address_type =address_type
 
-        obj.save()
-        if num==1:
-            return redirect('address')
+
+        api_key = 'AIzaSyA8PfqSoNTFsKTIryi5TCJTomzQMV_RETU'
+        pincode1 = '673634'
+        pincode2 = pincode
+        lat2, lng2 = get_coordinates(pincode2, api_key)
+
+        if lat2==1:
+            messages.error(req,'invalid pincode')
+            return redirect(editaddress,num,id)
         else:
-            return redirect(checkout)
+            obj.name =name
+            obj.phone = phone
+            obj.pincode = pincode
+            obj.locality = locality
+            obj.address = address
+            obj.city= city
+            obj.state =state
+            obj.landmark=landmark
+            obj.address_type=address_type
+            obj.save()
+            print(obj)
+            if num==1:
+                return redirect('address')
+            else:
+                return redirect(checkout)
     return render(req,'editaddress.html',{'obj':obj})
 
 @active_user
 def orders(req):
     user = req.user
     order = Orders.objects.filter(user_id =user).order_by('-id')
-    
+    today = date.today()
+    for i in order:
+        if i.order_date != today and i.confirm == False:
+            i.status = 'canceled'
+            i.save()
     context= {
-        'order' : order
+        'order' : order,
+        'today' : today
     }
     return render(req,'orders.html',context)
 
@@ -157,14 +187,20 @@ def change_status(req,id,status,product):
                         dummy_amount = dummy_amount + i.qty*i.rate
                         print(i.qty*i.rate,dummy_amount)
 
-                order.status = status
-                order.save()
+                
                 wallet = Wallet.objects.get(user_id = user) 
                 a = dummy_amount-order.discount
+                a = a + order.delivery
                 wallet.balance += a
                 wallet.save()
-                wallet_transaction = Wallet_transaction(wallet_id = wallet , description = 'Order canceled by You',amount = a ,balance = wallet.balance,order_id =order )
-                wallet_transaction.save()
+                if order.status == 'success':
+                    wallet_transaction = Wallet_transaction(wallet_id = wallet , description = 'Order returned by You',amount = a ,balance = wallet.balance,order_id =order )
+                    wallet_transaction.save()
+                else:
+                    wallet_transaction = Wallet_transaction(wallet_id = wallet , description = 'Order canceled by You',amount = a ,balance = wallet.balance,order_id =order )
+                    wallet_transaction.save()
+                order.status = status
+                order.save()
             else:
                 obj = items.objects.filter(order_id = id)
                 for i in obj:
@@ -181,11 +217,66 @@ def change_status(req,id,status,product):
                     wallet = Wallet.objects.get(user_id = user)
                     wallet.balance = wallet.balance + (obj.qty*int(obj.rate))
                     wallet.save()
-                    wallet_transaction = Wallet_transaction(wallet_id = wallet , description = 'Order canceled by You',amount = obj.qty*obj.rate ,balance = wallet.balance,order_id =order )
-                    wallet_transaction.save()
+                    if order.status=='success':
+                        wallet_transaction = Wallet_transaction(wallet_id = wallet , description = 'Order returned by You',amount = obj.qty*obj.rate ,balance = wallet.balance,order_id =order )
+                        wallet_transaction.save()
+                    else:
+                        wallet_transaction = Wallet_transaction(wallet_id = wallet , description = 'Order canceled by You',amount = obj.qty*obj.rate ,balance = wallet.balance,order_id =order )
+                        wallet_transaction.save()
             obj5.stock = obj5.stock + obj.qty
             obj.product_status = False
             obj.save()
             obj5.save()
             return redirect(orders)
     return redirect(orders)
+
+
+def retry_order(request):
+    data = json.loads(request.body)
+    id = data.get('id')
+    obj = Orders.objects.get(id= id)
+    item = items.objects.filter(order_id = id)
+    for i in item:
+        product = Product.objects.get(name = i.product)
+        if Product_offer.objects.filter(product_id = product).exists():
+            offer = Product_offer.objects.get(product_id = product)
+            p =int( product.price-( (product.price) * offer.offer /100))
+            print(i.rate , p)
+            if i.rate!=p:
+                obj.status = 'canceled'
+                obj.save()
+                return JsonResponse({'status': 'error', 'message': 'Product price mismatched. Order canceled.'}, status=400)
+        else:
+            if i.rate!= product.price:
+                obj.status = 'canceled'
+                obj.save()
+                return JsonResponse({'status': 'error', 'message': 'Product price mismatched. Order canceled.'}, status=400)
+        if product.stock<=0 or product.available==False or product.stock<i.qty:
+            obj.status = 'canceled'
+            obj.save()
+            return JsonResponse({'status': 'error', 'message': 'Product out of stock. Order canceled.'}, status=400)
+        
+    amount = obj.grand_total *100
+    request.session['order'] = id
+    client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+    order_amount = amount
+    order_currency = 'INR'
+    order_receipt = 'order_rcptid_11'
+    payment = client.order.create({
+        'amount': order_amount,
+        'currency': order_currency,
+        'receipt': order_receipt,
+        'payment_capture': '1'
+    })
+    
+    
+    # Return the necessary details as JSON
+    return JsonResponse({
+        'status': 'success',
+        'razorpay_key_id': settings.RAZORPAY_KEY_ID,
+        'order_id': payment['id'],
+        'amount': order_amount,
+        'currency': order_currency,
+        'callback_url': request.build_absolute_uri(reverse('successpage')),
+        'redirect_url': request.build_absolute_uri(reverse('failure')),
+    })

@@ -23,7 +23,8 @@ def shop(req,id=0):
     new = default.order_by('created_at')
     a_z = Product.objects.annotate(a_z=Lower('name')).order_by('name')
     z_a = Product.objects.annotate(a_z=Lower('name')).order_by('-name')
-    
+    offers = Product_offer.objects.all()  
+    offer_ids = {offer.product_id.id for offer in offers} 
     if id ==1:
         obj = high
     elif id ==2:
@@ -41,7 +42,9 @@ def shop(req,id=0):
         'brand':brand,
         'color' : colored,
         'type':type,
-        'connection':connection 
+        'connection':connection,
+        'offer' : offers,
+        'offer_ids' :offer_ids
     }
     return render(req,'shop.html',context)
 
@@ -53,7 +56,6 @@ def product_details(req,id):
     offer_rate = product.price
     if Brand_offer.objects.filter(brand_id = product.brand_id).exists():
         offer = Brand_offer.objects.get(brand_id = product.brand_id)
-        print(offer.offer,product.price)
         product_price = int(product.price ) 
         offered = offer.offer
         offer_rate = product_price - (product_price *(offered/100))
@@ -90,7 +92,7 @@ def product_details(req,id):
                 return redirect('cart') 
         else:
             messages.warning(req,'please login first')
-            return redirect(signin)
+            return redirect(signin,2)
             
     rating = Ratings.objects.filter(product_id = product)
     star = rating.aggregate(Sum('stars'))['stars__sum'] or 0
@@ -129,7 +131,8 @@ def search(req):
         new = obj.order_by('created_at')
         a_z = Product.objects.annotate(a_z=Lower('name')).order_by('name')
         z_a = Product.objects.annotate(a_z=Lower('name')).order_by('-name')
-        
+        offers = Product_offer.objects.all()  
+        offer_ids = {offer.product_id.id for offer in offers} 
         if id ==1:
             obj = high
         elif id ==2:
@@ -143,14 +146,15 @@ def search(req):
         else:
             obj = obj
         context = {
+            'obj':obj,
             'brand':brand,
             'color' : colored,
             'type':type,
             'connection':connection,
-            'search' : search,
-            'obj' : obj
+            'offer' : offers,
+            'offer_ids' :offer_ids
         }
         return render(req,'shop.html',context)
-        
+            
     else:
         return redirect(shop)

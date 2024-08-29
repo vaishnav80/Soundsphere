@@ -16,11 +16,14 @@ from dotenv import load_dotenv # type: ignore
 from wishlist.models import wishlist
 from user_profile.models import User_details
 from wallet.models import Wallet,Wallet_transaction
-
+from offer.models import Product_offer
+from django.db.models import Q
 
 def Home(req): 
     obj = Banner.objects.all()
     obj2 = Product.objects.all()
+    offers = Product_offer.objects.all()  
+    offer_ids = {offer.product_id.id for offer in offers}     
     wish = 0
     if req.user.is_active:
         user = req.user
@@ -28,19 +31,26 @@ def Home(req):
     context = {
         'obj':obj,
         'obj2':obj2,
-        'wish' : wish
+        'wish' : wish,
+        'offer' : offers,
+        'offer_ids' : offer_ids,
     }
     return render(req,'index.html',context)
 
 
 @never_cache
-def signin(req):
+def signin(req,id):
     if req.user.is_active:
         if req.user.is_staff:
             logout(req)
-            return redirect(signin)
+            return redirect(signin,1)
         else:
-            return redirect('profile')
+            if id==1:
+                return redirect('profile')
+            elif id==2:
+                return redirect('cart')
+            elif id ==3:
+               return redirect('wishlist') 
     else:
         if req.method == 'POST':
             username = req.POST['username']
@@ -49,22 +59,27 @@ def signin(req):
                 obj = User.objects.get(username = username)
             except User.DoesNotExist:
                 messages.error(req, 'Username is invalid')
-                return redirect(signin)
+                return redirect(signin,1)
             if obj.is_active:
                 user = authenticate(username = username ,password = password)
                 if user:
                     login(req,user)
                     wallet = Wallet.objects.get(user_id = user)
-                    if Wallet_transaction.objects.filter(description = 'Joining bonus').exists():
-                        return redirect('profile')
+                    if Wallet_transaction.objects.filter(Q(description = 'Joining bonus') & Q(wallet_id = wallet)).exists():
+                        if id==1:
+                            return redirect('profile')
+                        elif id==2:
+                            return redirect('cart')
+                        elif id ==3:
+                            return redirect('wishlist') 
                     else:
                         return redirect(refferal_code)
                 else:
                     messages.error(req, 'Invalid password')
-                    return redirect(signin) 
+                    return redirect(signin,id) 
             else:
                 messages.error(req, 'User blocked by Admin')
-                return redirect(signin) 
+                return redirect(signin,id) 
 
         return render(req,'signin.html')
 
@@ -88,13 +103,14 @@ def signup(request):
             if obj or obj2:
                 messages.error(request, 'Email or username  already exist ')
                 return redirect('signup')
-            if not User_details.objects.filter(refferal_code = refferal_code).exists():
+            if refferal_code and not User_details.objects.filter(refferal_code = refferal_code).exists():
                 messages.error(request, 'Inavalid refferal Code' )
                 return redirect('signup')
             request.session['username'] = username
             request.session['password'] = password
             request.session['email'] = email
-            request.session['refferal_code'] = refferal_code
+            if refferal_code:
+                request.session['refferal_code'] = refferal_code
             otp = secrets.token_hex(3)
             expires_at = timezone.now() + timedelta(minutes=5)
             request.session['otp'] = otp
@@ -115,7 +131,6 @@ def signup(request):
                 server.ehlo()  # Can be omitted
                 server.login(sender_email, password)
                 server.sendmail(sender_email, receiver_email, f'Your OTP code is {otp} , otp will expiry in 5 minutes')
-                print("Email sent successfully")
             except Exception as e:
                 print(f"Error: {e}")
             finally:
@@ -157,7 +172,7 @@ def otp_verification_view(request):
                         request.session.pop('user_info', None)
                         request.session.pop('otp_expires_at', None)
 
-                        return redirect('signin')
+                        return redirect('signin',1)
                     else:
                         messages.error(request,'User session data not found')
                         return redirect(otp_verification_view)
@@ -209,8 +224,6 @@ def forgot_password(req):
 
 def otp_verification_forgotpassword(request):
     if request.method == 'POST':
-        print('sds')
-    
         otp_code = request.POST['otp']
         stored_otp = request.session.get('otp')
         otp_expires_at = request.session.get('otp_expires_at')
@@ -262,7 +275,7 @@ def reset_password(request):
                     request.session.pop('email', None)
 
                     messages.success(request, 'Your password has been reset successfully.')
-                    return redirect('signin')
+                    return redirect('signin',1)
                 except User.DoesNotExist:
                     messages.error(request, 'No user associated with this email.')
             else:

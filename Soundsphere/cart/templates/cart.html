@@ -56,7 +56,7 @@
 							Help & FAQs
 						</a>
 
-						<a href="{% url 'signin' %}" class="flex-c-m trans-04 p-lr-25">
+						<a href="{% url 'signin' 1 %}" class="flex-c-m trans-04 p-lr-25">
 							My Account
 						</a>
 
@@ -150,7 +150,7 @@
 							Help & FAQs
 						</a>
 
-						<a href="{% url 'signin' %}" class="flex-c-m p-lr-10 trans-04">
+						<a href="{% url 'signin' 1 %}" class="flex-c-m p-lr-10 trans-04">
 							My Account
 						</a>
 
@@ -227,6 +227,8 @@
 								</tr>
                                 
 								
+									
+								
                                 {% for i in obj %}
             
                                     
@@ -266,7 +268,9 @@
                                 {% endfor %}
 								
 							</table>
-							
+							{% if not obj %}
+									<h5 style="color: red;"> No product in cart, Please add some products....</h3>
+								{% endif %}
 							
 								
 								

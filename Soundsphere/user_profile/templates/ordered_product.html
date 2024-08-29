@@ -118,33 +118,120 @@
           </div>
         </div>
     </div>
+
+    
+    
+      
     <div class="container mt-5">
+      {% if messages %}
+    
+    {% for i in messages %}
+      <h5 style="color: red;">{{i}}</h2>
+    {% endfor %}
+      
+      
+    {% endif %}
       <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
+    
         
-        {% if address.status == 'pending' %}
+      
+         
+        {% if address.status == 'pending' and address.confirm == True%}
         <form action="{% url 'change_status' address.id 'canceled' 'nothing' %}" method="post" style="display:inline;">
           {% csrf_token %}
           <button type="submit" class="btn btn-danger ms-4" onclick="showAlert2(event)">Cancel Order</button>
       </form>
         {% endif %}
         
+        {% if address.confirm == False and not address.status == 'canceled' %}
         
-        {% if address.status == 'success' %}
+          <button type="button" class="btn btn-danger ms-4" id="rzp-button1" > Retry payment</button>
+
+        {% endif %}
+        {% if address.status == 'success' and address.confirm == True %}
         <form action="{% url 'change_status' address.id 'canceled' 'nothing' %}" method="post" style="display:inline;">
           {% csrf_token %}
           <button type="submit" class="btn btn-danger ms-4" onclick="showAlert2(event)">Return Order</button>
       </form>
-      <button type="submit" class="btn btn-success ms-4">Print Invoice</button>
-      
-        {% endif %}
+      <button type="submit" class="btn btn-success ms-4"><a href="{% url 'invoice' address.id %}" style="color: #e0e0e0;">Print Invoice</a></button>
+      {% endif %}
+       
+      <div id="message" style="display: none;"></div>
+    
           
         <a href="{% url 'orders' %}"><button  class="btn btn-primary ms-4">Back</button></a>
-          
+         <input id="id" type="text" value="{{address.id}}" style="display: none;"> 
       </div>
   </div>
  
 
+	<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script>
+let id = document.getElementById('id')
+
+ 
+
+document.getElementById('rzp-button1').onclick = function(e) {
+  let a = id.value
+  
+    e.preventDefault();
+    fetch('{% url "retry_order" %}',{
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          'id':a
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+      const messageDiv = document.getElementById('message');
+    
+    if (data.status === 'success') {
+        openRazorpayModal(data);
+    } else {
+        messageDiv.textContent = data.message;
+        messageDiv.style.color = 'red';
+        messageDiv.style.display = 'block';
+    }
+    })
+    
+    .catch(error => console.error('Error:', error));
+};
+function openRazorpayModal(data) {
+    console.log('Opening Razorpay Modal with data:', data);  // Debugging line
+    var options = {
+        "key": data.razorpay_key_id,
+        "amount": data.amount,
+        "currency": data.currency,
+        "name": "SoundSphere",
+        "description": "Purchase Description",
+        "order_id": data.order_id,
+        "handler": function (response) {
+            console.log('Payment Success:', response);  // Debugging line
+            window.location.href = data.callback_url;
+        },
+        "prefill": {
+            "name": "Customer Name",
+            "email": "customer@example.com",
+            "contact": "9999999999"
+        },
+        "theme": {
+            "color": "#F37254"
+        },
+        "modal": {
+            "ondismiss": function() {
+                console.log('Payment Modal Closed. Redirecting to failure URL');  // Debugging line
+                window.location.href = data.redirect_url;
+            }
+        }
+    };
+    var rzp1 = new Razorpay(options);
+    rzp1.open();
+}
+
       function showAlert() {
     var userResponse = confirm("Are you sure you want to cancel this product?");
     if (userResponse) {

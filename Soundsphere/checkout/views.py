@@ -20,6 +20,25 @@ from offer.models import Product_offer,Brand_offer
 import json
 from user.views import signin
 from wallet.views import active_user
+import requests # type: ignore
+from geopy.distance import great_circle
+from django.urls import reverse
+
+
+def get_coordinates(pincode, api_key):
+    url = f'https://maps.googleapis.com/maps/api/geocode/json?address={pincode}&key={api_key}'
+    response = requests.get(url)
+    data = response.json()
+    if data['status'] == 'OK':
+        location = data['results'][0]['geometry']['location']
+        return location['lat'], location['lng']
+    else:
+        try:
+            raise ValueError('Error in geocoding request')
+        except:
+            return 1,2
+def calculate_distance(coord1, coord2):
+    return great_circle(coord1, coord2).kilometers
 
 @never_cache
 @login_required
@@ -40,8 +59,26 @@ def checkout(req):
             coupon_code = req.session.get('coupon')
             a =req.session.get('address')
             msg = ''
+            distance = 0
             if a:
-                msg = User_address.objects.get(id = a)
+                if User_address.objects.filter(id = a).exists():
+                    msg = User_address.objects.get(id = a)
+                    pincode = msg.pincode
+                    api_key = 'AIzaSyA8PfqSoNTFsKTIryi5TCJTomzQMV_RETU'
+                    pincode1 = '673634'
+                    pincode2 = pincode
+
+                    lat1, lng1 = get_coordinates(pincode1, api_key)
+                    lat2, lng2 = get_coordinates(pincode2, api_key)
+
+                    if lat2==1:
+                        messages.error(req,'invalid pincode')
+                    else:
+                        coords1 = (lat1, lng1)
+                        coords2 = (lat2, lng2)
+                        distance = calculate_distance(coords1, coords2)
+                        if distance>2000:
+                            messages.error(req,'this product is not available in this area')
             lst = []
             for i in carts:
                 if Product_offer.objects.filter(product_id = i.product_id).exists():
@@ -67,14 +104,24 @@ def checkout(req):
                     i.rate=p
                     i.save()
                     lst.append(p)
-
+                      
+            charge = 0
+            if distance<=100:
+                charge = 50
+            elif distance >100:
+                charge = 100
+            elif distance >500:
+                charge = 200
+            
+            req.session['charge'] = charge
             context = {
                 'address' : address,
                 'cart' : carts,
                 'option':msg,
                 'coupon' : coupon,
                 'lst' :json.dumps(lst),
-                'coupon_code' : coupon_code
+                'coupon_code' : coupon_code,
+                'delivery' : charge
             }
             return render(req,'checkout.html',context)
         
@@ -85,26 +132,28 @@ def checkout(req):
         return redirect(signin)
 
 def conform(req):
+    
     user = req.user
     cart = Cart.objects.filter(user_id = user)
     add = req.session.get('address')
     grand = req.session.get('sub_total')
-    offer = req.session.get('offer')
-    if offer:
-        grand = grand - offer
+    charge = req.session.get('charge')
     if add == None:
         messages.error(req,'Choose a Address First')
         return redirect(checkout)
     address = User_address.objects.get(id =add)
     if req.method == 'POST':
         for i in cart:
-            if i.product_id.stock<=0 or i.product_id.available==False:
+            if i.product_id.stock<=0 or i.product_id.available==False :
                 i.delete()
                 return redirect('details',id = i.product_id.id)
             elif i.product_id.stock<i.qty:
                 messages.warning(req,f'stock exceeded ,  please recheck {i.product_id.name} stock left {i.product_id.stock} only')
                 return redirect('cart')
         payment = req.POST['paymentMethod']
+        offer = req.session.get('offer')
+        if offer == None:
+            offer =0
         if payment == 'wallet':
             wallet = Wallet.objects.get(user_id = user)
             if wallet.balance < int(grand) :
@@ -113,16 +162,28 @@ def conform(req):
             else:
                 wallet.balance = wallet.balance - int(grand)
                 wallet.save()
-        
+        if payment == 'Cash On Delivery' and grand >1000:
+            messages.warning(req,'Orders above Rs 1000 is not available in cash on delivery, Please choose another payment option')
+            return redirect(checkout)
+        if grand>10000:
+            charge =0
         addr = shiped_address(name = address.name , phone = address.phone , pincode = address.pincode,address = address.address , city = address.city, state = address.state )
         addr.save()
         
-        obj = Orders(payment = payment , user_id = user ,status = Orders.pending,address_id = addr,grand_total = grand,)
+        obj = Orders(payment = payment , user_id = user ,status = Orders.pending,address_id = addr,grand_total = grand,delivery = charge,discount = offer)
         obj.save()
         req.session['order'] = obj.id
-        if payment == 'Razorpay':
-            return redirect(create_order)
-        elif payment == 'wallet':
+        coupon_id = req.session.get('coupon_id')
+        user_coupon = user_coupons.objects.filter(Q(coupon_id = coupon_id) & Q(user_id = user.id))
+        user_coupon.delete()
+        
+        for i in cart:
+            obj.total = obj.total + i.rate*i.qty
+            obj.save() 
+            item = items(product = i.product_id.name , rate = i.rate , qty = i.qty , order_id = obj ,total_rate = i.product_id.price)
+            item.save()
+            i.delete()
+        if payment == 'wallet':
             wallet_transaction = Wallet_transaction(wallet_id = wallet , description = 'purchase',amount = grand ,balance = wallet.balance,order_id =obj )
             wallet_transaction.save()
         return redirect(successpage)
@@ -176,37 +237,14 @@ def remove_coupon(req):
 
 
 @active_user
-def successpage(req):
-    user = req.user
-    cart = Cart.objects.filter(user_id = user)
-    for i in cart:
-        if i.product_id.stock<=0 or i.product_id.available==False:
-            i.delete()
-            return redirect('details',id = i.product_id.id)
-        elif i.product_id.stock<i.qty:
-            messages.warning(req,f'stock exceeded ,  please recheck {i.product_id.name} stock left {i.product_id.stock} only')
-            return redirect('cart')
-    coupon_id = req.session.get('coupon_id')
-    grand = req.session.get('sub_total')
-    offer = req.session.get('offer')
-    if offer:
-        grand = grand - offer
+def successpage(req): 
     order = req.session.get('order')
-    obj = Orders.objects.get(id = order)
-    user_coupon = user_coupons.objects.filter(Q(coupon_id = coupon_id) & Q(user_id = user.id))
-    user_coupon.delete()
-    
-    for i in cart:
-        obj5 = Product.objects.get(name = i.product_id)
-        if obj5.stock>=i.qty:
-            obj5.stock = obj5.stock - i.qty
-            obj5.save()
-            obj.total = obj.total + i.rate*i.qty
-            obj.discount = obj.total - int(grand)
-            obj.save() 
-            item = items(product = i.product_id.name , rate = i.rate , qty = i.qty , order_id = obj ,total_rate = i.product_id.price)
-            item.save()
-            i.delete()
+    obj = Orders.objects.get(id = order) 
+    item = items.objects.filter(order_id = obj)
+    for i in item:
+        obj5 = Product.objects.get(name = i.product)
+        obj5.stock = obj5.stock - i.qty
+        obj5.save()
     obj.confirm = True
     obj.save()   
     req.session.pop('address',None)
@@ -214,10 +252,12 @@ def successpage(req):
     req.session.pop('total',None)
     req.session.pop('coupon_id',None)
     req.session.pop('order',None)
+    req.session.pop('charge',None)
     return render(req,'conform.html')
 
 
 def shop_address(req):
+    
     user_id = req.user
     if req.method == 'POST':
         name = req.POST['name']
@@ -230,38 +270,98 @@ def shop_address(req):
         landmark = req.POST['landmark']
         address_type = req.POST['address_type']
 
-        obj = User_address(name =name,phone = phone,pincode = pincode,locality = locality,
-                           address = address,city= city,state =state,landmark=landmark,address_type=address_type,user_id = user_id)
-        obj.save()
-        return redirect(checkout)
-    
+
+        api_key = 'AIzaSyA8PfqSoNTFsKTIryi5TCJTomzQMV_RETU'
+        pincode1 = '673634'
+        pincode2 = pincode
+
+        lat1, lng1 = get_coordinates(pincode1, api_key)
+        lat2, lng2 = get_coordinates(pincode2, api_key)
+
+        if lat2==1:
+            messages.error(req,'invalid pincode')
+        else:
+            coords1 = (lat1, lng1)
+            coords2 = (lat2, lng2)
+            distance = calculate_distance(coords1, coords2)
+            if distance>2000:
+                messages.error(req,'this product is not available in this area')
+                return redirect(checkout)
+            else:
+                obj = User_address(name =name,phone = phone,pincode = pincode,locality = locality,
+                                address = address,city= city,state =state,landmark=landmark,address_type=address_type,user_id = user_id)
+                obj.save()
+                return redirect(checkout)
+    return redirect(checkout)
 
 @active_user
 def create_order(request):
-    client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+    user = request.user
+    cart = Cart.objects.filter(user_id = user)
+    add = request.session.get('address')
     grand = request.session.get('sub_total')
+    charge = request.session.get('charge')
+    if grand>10000:
+        charge = 0
     offer = request.session.get('offer')
-    if offer:
-        grand = grand - offer
-    order_amount = grand *100
+    if offer == None:
+        offer =0
+    address = User_address.objects.get(id =add)
+    for i in cart:
+            if i.product_id.stock<=0 or i.product_id.available==False:
+                i.delete()
+                return redirect('details',id = i.product_id.id)
+            elif i.product_id.stock<i.qty:
+                messages.warning(request,f'stock exceeded ,  please recheck {i.product_id.name} stock left {i.product_id.stock} only')
+                return redirect('cart')
+    addr = shiped_address(name = address.name , phone = address.phone , pincode = address.pincode,address = address.address , city = address.city, state = address.state )
+    addr.save()
+        
+    obj = Orders(payment = 'Razorpay' , user_id = user ,status = Orders.pending,address_id = addr,grand_total = grand,delivery = charge,discount = offer)
+    obj.save()
+    request.session['order'] = obj.id
+    
+    coupon_id = request.session.get('coupon_id')
+    user_coupon = user_coupons.objects.filter(Q(coupon_id = coupon_id) & Q(user_id = user.id))
+    user_coupon.delete()
+    
+    for i in cart:
+        obj.total = obj.total + i.rate*i.qty
+        obj.save() 
+        item = items(product = i.product_id.name , rate = i.rate , qty = i.qty , order_id = obj ,total_rate = i.product_id.price)
+        item.save()
+        i.delete()
+    client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+    order_amount = grand * 100  
     order_currency = 'INR'
     order_receipt = 'order_rcptid_11'
-    
     payment = client.order.create({
         'amount': order_amount,
         'currency': order_currency,
         'receipt': order_receipt,
         'payment_capture': '1'
     })
-
-    context = {
+    
+    
+    # Return the necessary details as JSON
+    return JsonResponse({
         'razorpay_key_id': settings.RAZORPAY_KEY_ID,
         'order_id': payment['id'],
         'amount': order_amount,
         'currency': order_currency,
-    }
-    return render(request, 'payment.html', context)
+        'callback_url': request.build_absolute_uri(reverse('successpage')),
+        'redirect_url': request.build_absolute_uri(reverse('failure')),
+    })
 
+
+def payment_failure(req):
+    req.session.pop('address',None)
+    req.session.pop('offer',None)
+    req.session.pop('total',None)
+    req.session.pop('coupon_id',None)
+    req.session.pop('order',None)
+    req.session.pop('charge',None)
+    return render(req, 'payment_failure.html')
 
 from django.http import JsonResponse
 @csrf_exempt
@@ -269,6 +369,7 @@ def save_subtotal(req):
     if req.method == 'POST':
         sub_total = req.POST.get('sub_total')
         req.session['sub_total'] = int(sub_total)
+        print(sub_total)
         return redirect('checkout')
 
 

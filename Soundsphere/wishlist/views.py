@@ -17,14 +17,15 @@ def wish(req):
         return render(req,'wishlist.html',context)
     else:
         messages.warning(req,'please login first')
-        return redirect(signin)
+        return redirect(signin,3)
 
 def add_to_wishlist(req):
     
-    if req.user.is_active and not req.user.is_authenticated:
+    if req.user.is_active and  req.user.is_authenticated:
         if req.method == 'POST':
             user = req.user
-            id = req.POST.get('product_id')
+            id = req.POST.get('id')
+          
             product = Product.objects.get(id = id)
             if wishlist.objects.filter(Q(product_id= product) & Q(user_id = user)).exists():
                 return JsonResponse({'warning': True})
@@ -36,7 +37,8 @@ def add_to_wishlist(req):
 
         return JsonResponse({'success': False})
     else:
-        return redirect(signin)
+        print('dfs')
+        return redirect(signin,3)
     
 def wish_remove(req,id):
     
@@ -44,16 +46,5 @@ def wish_remove(req,id):
     obj.delete()
     return redirect(wish)
 
-def addw(req,id):
-    if req.user.is_active and req.user.is_authenticated: 
-        user = req.user
-        product = Product.objects.get(id = id)
-        if wishlist.objects.filter(product_id= product).exists():
-            return redirect(wish)
-        wishes = wishlist(product_id = product , user_id = user)
-        wishes.save()
-        return redirect(wish)
-    else:
-        messages.warning(req,'please login first')
-        return redirect(signin)
+
     

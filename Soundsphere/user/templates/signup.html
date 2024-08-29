@@ -10,60 +10,92 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .form-container {
-            max-width: 500px;
-            padding: 20px;
-            margin: 50px auto;
-            background-color: #ffffff;
-            box-shadow: rgba(0, 0, 0, 0.1) 0px 5px 15px;
-            border-radius: 10px;
-        }
-        .form-container h3 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .form-container .form-label {
-            font-weight: bold;
-        }
-        .form-container .btn {
-            width: 100%;
-        }
-        .form-container p {
-            text-align: center;
-        }
-        .form-container small {
-            color: red;
-        }
-        .error-message {
-            color: red;
-            font-size: 0.875rem;
-            margin-top: 10px;
-        }
-        .password-wrapper {
-            position: relative;
-        }
-        .password-wrapper .toggle-password {
-            position: absolute;
-            top: 70%;
-            right: 10px;
-            transform: translateY(-50%);
-            cursor: pointer;
-        }
-    </style>
+    body {
+        background-size: cover;
+        background-image: url('../../media/product_images/headphone-earphone-headset-for-music-line-pop-art-potrait-logo-colorful-design-with-dark-background-abstract-illustration-vector.jpg');
+    }
+    body::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: inherit;
+        background-size: inherit;
+        background-attachment: fixed;
+        filter: blur(10px); /* Adjust the blur intensity */
+        z-index: -1;
+    }
+    .logo {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        width: 150px; /* Increase the width to make it larger */
+        height: 150px; /* Maintain aspect ratio */
+        background-image: url('../../static/images/soundsphere-removebg-preview.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        filter: brightness(0) invert(1); /* This makes the logo white */
+    }
+    .logo a {
+        display: block;
+        width: 100%;
+        height: 100%;
+        text-decoration: none;
+    }
+    .form-container {
+        max-width: 500px;
+        padding: 20px;
+        margin: 50px auto;
+        background-color: #ffffff;
+        box-shadow: rgba(0, 0, 0, 0.1) 0px 5px 15px;
+        border-radius: 10px;
+    }
+    .form-container h3 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .form-container .form-label {
+        font-weight: bold;
+    }
+    .form-container .btn {
+        width: 100%;
+    }
+    .form-container p {
+        text-align: center;
+    }
+    .form-container small {
+        color: red;
+    }
+    .error-message {
+        color: red;
+        font-size: 0.875rem;
+        margin-top: 10px;
+    }
+    .password-wrapper {
+        position: relative;
+    }
+    .password-wrapper .toggle-password {
+        position: absolute;
+        top: 70%;
+        right: 10px;
+        transform: translateY(-50%);
+        cursor: pointer;
+    }
+</style>
 </head>
 <body>
+    <div class="logo">
+        <a href="/">.</a>
+    </div>
     <div class="form-container">
         <h3><strong>Signup Form</strong></h3>
         
         {% if messages %}
-            
             {% for i in messages %}
                 <p style="color: red;">{{i}}</p>
             {% endfor %}
-                
         {% endif %}
             
         <form method="post" id="myForm">
@@ -91,8 +123,8 @@
                 <label for="refferal_code">Referral Code</label>
                 <input type="text" class="form-control" name="refferal_code" id="refferal_code" placeholder="Referral Code (optional)">
             </div>
-            <button class="btn btn-primary" type="submit">Register</button>
-            <p>Already have an account? <a href="{% url 'signin' %}">Login</a></p>
+            <button class="btn" style="background-color:  #000233;color: white;" type="submit">Register</button>
+            <p>Already have an account? <a href="{% url 'signin' 1 %}">Login</a></p>
         </form>
     </div>
     <script>
@@ -136,7 +168,6 @@
                 errorMessages.push('Username should not contain spaces.');
                 isValid = false;
             }
-
 
             // Check required fields
             if (!username || !email || !password || !confirmPassword) {

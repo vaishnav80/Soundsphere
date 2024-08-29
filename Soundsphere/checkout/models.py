@@ -31,6 +31,7 @@ class Orders(models.Model):
     address_id = models.ForeignKey(shiped_address,on_delete=models.CASCADE,default=1)
     total = models.IntegerField(default=0)
     discount = models.IntegerField(default=0)
+    delivery = models.IntegerField(default=0)
     confirm = models.BooleanField(default=False)
 
 

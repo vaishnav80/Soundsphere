@@ -54,7 +54,7 @@
 							Help & FAQs
 						</a>
 
-						<a href="{% url 'signin' %}" class="flex-c-m trans-04 p-lr-25">
+						<a href="{% url 'signin' 1 %}" class="flex-c-m trans-04 p-lr-25">
 							My Account
 						</a>
 
@@ -148,7 +148,7 @@
 							Help & FAQs
 						</a>
 
-						<a href="{% url 'signin' %}" class="flex-c-m p-lr-10 trans-04">
+						<a href="{% url 'signin' 	1 %}" class="flex-c-m p-lr-10 trans-04">
 							My Account
 						</a>
 
@@ -393,11 +393,11 @@
 					
 				{% for i in obj %}
 				
-				<div class="col-sm-6 col-md-4 col-lg-3 p-b-35  isotope-item {{i.brand_id.name}} {{i.color}} {{i.connection_id.name}} {{i.type_id.type}}">
+				<div class="col-sm-6 col-md-4 col-lg-3 p-b-35 product isotope-item {{i.brand_id.name}} {{i.color}} {{i.connection_id.name}} {{i.type_id.type}}" data-product-id="{{ i.id }}" data-product-price="{{ i.price }}" >
 					<!-- Block2 -->
 					<div class="block2 small-block p-2 border rounded bg-white">
 						<div class="block2-pic hov-img0">
-							<img src="{{ i.image.url }}" alt="IMG-PRODUCT" class="img-fluid">
+							<a href="{% url 'details' i.id %}"><img  src="{{ i.image.url }}" alt="IMG-PRODUCT" class="img-fluid"></a>
 			
 							<a href="{% url 'details' i.id %}" class="block2-btn flex-c-m stext-103 cl2 size-102 bg0 bor2 hov-btn1 p-2 trans-04 ">
 								Quick View
@@ -410,9 +410,17 @@
 									{{ i.name }}
 								</a>
 			
-								<span class="stext-105 cl3">
-									{{ i.price }}
-								</span>
+								{% if i.id in offer_ids %}								
+								{% for j in offer %}								
+								{% if j.product_id.name == i.name %}
+								<p  style="color: black;">₹ <span class="total "  style="color: black;"></span> <span class="text-danger offer" style="display: none;">{{j.offer}}%</span> 
+									
+									<span class="text-danger" style="font-size: 13px;"><del>{{ i.price }}</del></span></p>
+								{% endif %}								
+								{% endfor %}
+							{% else %}
+							<p class="price"><span class="" style="color: black;">₹ {{i.price}}</span></p>
+							{% endif %}
 							</div>
 			
 							<div class="block2-txt-child2 flex-r p-t-1">
@@ -432,7 +440,39 @@
 			
 		</div>
 	</section>
+	<script>
+		
+		document.addEventListener('DOMContentLoaded', function() {
+			// Get all products
+			const products = document.querySelectorAll('.product');
 
+			products.forEach(product => {
+				// Get product data
+				const productId = product.dataset.productId;
+				console.log(productId)
+				const productPrice = parseFloat(product.dataset.productPrice);
+				console.log(productPrice);
+				
+				// Check if the product has an offer
+				const offerElement = product.querySelector('.offer');
+				console.log(offerElement)
+				if (offerElement) {
+					const offerPercentage = parseFloat(offerElement.textContent);
+					
+					const offerAmount = productPrice * (offerPercentage / 100);
+					const finalPrice = productPrice - offerAmount;
+
+					// Update the price in the DOM
+					offerElement.textContent = `${offerPercentage}%`;
+					const totalElement = product.querySelector('.total');
+					if (totalElement) {
+						totalElement.innerHTML = `${finalPrice.toFixed(2)}`;
+					}
+				}
+			});
+		});
+
+</script>
 
 	<!-- Footer -->
 	<footer class="bg3 p-t-75 p-b-32">
@@ -631,7 +671,7 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 					url: '{% url "add_to_wishlist" %}', // URL of your Django view
 					method: 'POST',
 					data: {
-						'product_id': productId,
+						'id': productId,
 						'csrfmiddlewaretoken': '{{ csrf_token }}'
 					},
 					success: function(response) {
@@ -643,7 +683,7 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 						}
 						 
 						else {
-							swal("Error", "Failed to add to wishlist!", "error");
+							swal("Error", "User is not logged in!", "error");
 						}
 						if(response.warning){
 							console.log('warning')

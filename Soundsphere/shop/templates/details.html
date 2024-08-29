@@ -79,7 +79,7 @@
 							Help & FAQs
 						</a>
 
-						<a href="{% url 'signin' %}" class="flex-c-m trans-04 p-lr-25">
+						<a href="{% url 'signin' 1 %}" class="flex-c-m trans-04 p-lr-25">
 							My Account
 						</a>
 
@@ -173,7 +173,7 @@
 							Help & FAQs
 						</a>
 
-						<a href="{% url 'signin' %}" class="flex-c-m p-lr-10 trans-04">
+						<a href="{% url 'signin' 1 %}" class="flex-c-m p-lr-10 trans-04">
 							My Account
 						</a>
 
@@ -216,6 +216,16 @@
                                 
                                     
                                 <div class="slick3 gallery-lb">
+									<div class="item-slick3" data-thumb="{{product.image.url}}">
+                                        <div class="wrap-pic-w pos-relative">
+											<div class="zoom-container">
+												<img src="{{product.image.url}}" class="img-fluid"  alt="IMG-PRODUCT">
+											  </div>
+                                            <a class="flex-c-m size-108 how-pos1 bor0 fs-16 cl10 bg0 hov-btn3 trans-04" href="{{product.image.url}}">
+                                                <i class="fa fa-expand"></i>
+                                            </a>
+                                        </div>
+                                    </div>
                                     {% for i in product_img %}
                                     <div class="item-slick3" data-thumb="{{i.image.url}}">
                                         <div class="wrap-pic-w pos-relative">
@@ -283,18 +293,19 @@
 								{% endif %}
 							{% endif %}
 								
-							
+							<p id="id" style="display: none;" value="{{product.id}}"></p>
 								
 
                             
                             <!--  -->
                             <div class="p-t-20">
+								
 								<form action="" method="post" id="productform" data-stock="{{ i.product.stock }}" style="display: flex; gap: 10px; align-items: center;">
 									{% csrf_token %}
 							
 									<!-- First button: Go to cart -->
-									<button  class="flex-c-m stext-101 cl0 size-101 bg1 bor1 hov-btn1 p-lr-15 trans-04 ">
-										<a href="{% url 'addw' product.id %}" style="color: white;">Add to Wishlist</a>
+									<button type="button" id="myButton"   class="flex-c-m stext-101 cl0 size-101 bg1 bor1 hov-btn1 p-lr-15 trans-04 ">
+										Add to Wishlist
 									</button>
 							
 									<!-- Second button: Add to cart or Go to cart based on count -->
@@ -506,6 +517,45 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 		</div>
 	</footer>
 <script>
+	function myFunction() {
+            
+			let id = document.getElementById('id').getAttribute('value')
+
+			console.log(id);
+			
+			$.ajax({
+            type: 'POST',
+            url: '{% url "add_to_wishlist" %}',
+            data: {
+                'id': id,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+				if (response.success) {
+							swal( " product is added to wishlist!", "success");
+							$button.addClass('js-addedwish-b2');
+							$button.off('click');
+						}
+
+						else {
+							swal("Error", "User is not logged in!", "error");
+						}
+						if (response.warning) {
+							console.log('warning')
+							swal("warning", "Its already added!", "warning");
+						}
+            },
+            error: function(response) {
+                console.error('Error:', response);
+            }
+        });
+
+        }
+	
+	document.getElementById("myButton").onclick = myFunction;
+
+	 
+
 	function performCalculation() {
 		console.log('vbnm')
         // Get the values from the input fields

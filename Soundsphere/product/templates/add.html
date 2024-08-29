@@ -3,6 +3,14 @@
 {% block base %}
 <div class="container mt-5">
     <h2 class="mb-4">Add/Edit Product</h2>
+    {% if messages %}
+        
+    {% for i in messages %}
+        <span style="color: red;">{{i}}</span>
+    {% endfor %}
+    
+{% endif %}
+<div id="error-message" style="color: red; display: none;"></div>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="form-group">
@@ -55,13 +63,7 @@
         <button type="button" class="btn btn-warning ms-4">Back</button></a>
     </form>
     
-    {% if messages %}
-        
-        {% for i in messages %}
-            {{i}}
-        {% endfor %}
-            
-    {% endif %}
+   
         
 </div>
 
@@ -122,9 +124,10 @@
                                     window.location.href = '/product/';
                                     console.log(data.message);
                                 } else {
-                                    // Handle error (e.g., show error message)
-                                    console.error('Error:', data.message);
-                                    alert(data.message); // Display error to the user
+                                    
+                                    const errorMessage = document.getElementById('error-message');
+                                    errorMessage.textContent = data.message;
+                                    errorMessage.style.display = 'block';
                                 }
                             })
                             .catch(error => console.error('Fetch error:', error));

@@ -32,13 +32,24 @@ def add(request):
             cleaned_data = form.cleaned_data
             price = cleaned_data.get('price')
             stock = cleaned_data.get('stock')
-            print(stock)
-            print(price)
-            if price < 0 or stock < 0:
-                return JsonResponse({'success': False, 'message': 'Invalid price or stock value.'}, status=400)
+            image = cleaned_data.get('image')
+            name = cleaned_data.get('name')
+            print(name)
+            if Product.objects.filter(name = name).exists():
+                messages.error(request,'Product name already exist ')
+                return redirect(add)
+            elif price < 0 or stock < 0:
+                messages.error(request,'invalid price or stock, value must be a positive number')
+                return redirect(add)
+            elif not image:
+                messages.error(request,'add image for this product')
+                return redirect(add)
             else:
                 form.save()
-                return JsonResponse({'success': True, 'message': 'Product added successfully.'})
+                print('dfs')
+                return redirect(product_list)
+        else:
+            return redirect(product_list)
     else:
         
         form = ProductForm()
@@ -65,6 +76,12 @@ def product_update(request, pk):
         
         form = ProductForm(request.POST, request.FILES, instance=product)
         if form.is_valid():
+            cleaned_data = form.cleaned_data
+            price = cleaned_data.get('price')
+            stock = cleaned_data.get('stock')
+            if price < 0 or stock < 0:
+                messages.error(request,'invalid price or stock, value must be a positive number')
+                return redirect(product_update,pk)
             form.save()
             return redirect('product_list') 
     else:

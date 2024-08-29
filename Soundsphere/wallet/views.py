@@ -11,7 +11,7 @@ def active_user(func):
             return func(req, *args, **kwargs)
         else:
             messages.warning(req,'please login first')
-            return redirect(signin)
+            return redirect(signin,1)
     return _wrapped_view
 
 @active_user
@@ -24,3 +24,4 @@ def wallet(req):
             'transaction' : transaction
         }
         return render(req,'wallet.html',context)
+

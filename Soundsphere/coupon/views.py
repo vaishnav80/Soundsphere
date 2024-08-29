@@ -92,10 +92,10 @@ def edit_coupon(req,id):
         valid_from = datetime.strptime(valid_from, "%Y-%m-%d").date()
         if expiry <today or int(offer)<0:
             messages.error(req,'Invalid input expiry date must be an upcoming date also offer must be a positive amount')
-            return redirect(edit_coupon)
+            return redirect(edit_coupon,id)
         elif valid_from<today or expiry<valid_from:
             messages.error(req,'Invalid input check the dates...')
-            return redirect(edit_coupon)
+            return redirect(edit_coupon,id)
         coupons.save()
         return redirect(coupon)
     context = {
