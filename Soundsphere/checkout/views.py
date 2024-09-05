@@ -167,7 +167,7 @@ def conform(req):
             return redirect(checkout)
         if grand>10000:
             charge =0
-        addr = shiped_address(name = address.name , phone = address.phone , pincode = address.pincode,address = address.address , city = address.city, state = address.state )
+        addr = shiped_address(name = address.name , phone = address.phone , pincode = address.pincode,address = address.address , city = address.city, state = address.state,user_id =user )
         addr.save()
         
         obj = Orders(payment = payment , user_id = user ,status = Orders.pending,address_id = addr,grand_total = grand,delivery = charge,discount = offer)
@@ -314,7 +314,7 @@ def create_order(request):
             elif i.product_id.stock<i.qty:
                 messages.warning(request,f'stock exceeded ,  please recheck {i.product_id.name} stock left {i.product_id.stock} only')
                 return redirect('cart')
-    addr = shiped_address(name = address.name , phone = address.phone , pincode = address.pincode,address = address.address , city = address.city, state = address.state )
+    addr = shiped_address(name = address.name , phone = address.phone , pincode = address.pincode,address = address.address , city = address.city, state = address.state ,user_id = user)
     addr.save()
         
     obj = Orders(payment = 'Razorpay' , user_id = user ,status = Orders.pending,address_id = addr,grand_total = grand,delivery = charge,discount = offer)

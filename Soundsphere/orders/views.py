@@ -101,7 +101,8 @@ def invoice(request,id):
     buffer = io.BytesIO()
     pdf = SimpleDocTemplate(buffer, pagesize=A4)
     elements = []
-    image_path = 'assets\images\soundsphere-removebg-preview.png'
+    image_path = 'assets/images/soundsphere-removebg-preview.png'
+
     img = Image(image_path, width=100, height=50) 
     elements = []
     data = [[img, ''],  # Image in the first cell, empty space in the second cell

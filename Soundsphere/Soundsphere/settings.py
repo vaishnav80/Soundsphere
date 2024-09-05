@@ -23,7 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-itet6ti-sz55yr$=(b!&shpi^&v_dk$soimjf=_ej9jqeh%7fn'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
+
+
 
 ALLOWED_HOSTS = ['13.60.207.16','0.0.0.0','soundsphere.site','www.soundsphere.site']
 

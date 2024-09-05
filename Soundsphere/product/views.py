@@ -35,14 +35,8 @@ def add(request):
             image = cleaned_data.get('image')
             name = cleaned_data.get('name')
             print(name)
-            if Product.objects.filter(name = name).exists():
-                messages.error(request,'Product name already exist ')
-                return redirect(add)
-            elif price < 0 or stock < 0:
+            if price < 0 or stock < 0:
                 messages.error(request,'invalid price or stock, value must be a positive number')
-                return redirect(add)
-            elif not image:
-                messages.error(request,'add image for this product')
                 return redirect(add)
             else:
                 form.save()

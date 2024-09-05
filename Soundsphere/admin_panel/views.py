@@ -191,7 +191,8 @@ def generate_pdf_report(request, date_range, start_date, end_date):
     buffer = BytesIO()
     pdf = SimpleDocTemplate(buffer, pagesize=A4)
 
-    image_path = 'assets\images\soundsphere-removebg-preview.png'
+    image_path = 'assets/images/soundsphere-removebg-preview.png'
+
     img = Image(image_path, width=100, height=50) 
     elements = []
     data = [[img, ''],  # Image in the first cell, empty space in the second cell
